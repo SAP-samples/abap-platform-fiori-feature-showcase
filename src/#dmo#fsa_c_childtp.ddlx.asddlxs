@@ -1,0 +1,114 @@
+@Metadata.layer: #CORE
+
+// Search Term #HeaderInfo-Child, #OPTable
+@UI: {
+  headerInfo: { 
+    typeName: 'Child Entity 1 (1..n)',
+    typeNamePlural: 'Child Entities',
+    title.value: 'ID',
+    description.value: 'StringProperty',
+    typeImageUrl: 'sap-icon://blank-tag',
+    imageUrl: 'StreamFile'
+  },
+  // Search Term #PresentationVariant-Child
+  presentationVariant: [
+    { 
+      qualifier: 'pVariant',
+      maxItems: 7,
+      sortOrder: [
+        {
+          by: 'StringProperty',
+          direction: #DESC
+        }
+      ],
+      visualizations: [{type: #AS_LINEITEM}]
+    }
+  ],
+  // Search Term #SelectionVariant-Child
+  selectionVariant: [
+    { 
+      qualifier: 'sVariant',
+      text: 'SelectionVariant (Positive criticality)',
+      filter: 'CriticalityCode EQ 3'
+    }
+  ],
+  // Search Term #SelectionPresentationVariant-Child
+  selectionPresentationVariant: [
+    { text: '(#SelectionPresentationVariant-Child)',
+      qualifier: 'ChildSP',
+      presentationVariantQualifier: 'pVariant',
+      selectionVariantQualifier: 'sVariant'
+    }
+  ]
+}
+
+annotate entity /DMO/FSA_C_ChildTP
+  with 
+{
+  @UI.facet: [
+    { 
+      purpose: #HEADER,
+      type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'FieldWithPercent',
+      id: 'FacetWithPercent'
+    },
+    // Search Term #Stream
+    {
+      purpose: #HEADER,
+      type: #FIELDGROUP_REFERENCE,
+      targetQualifier: 'Stream',
+      label: 'Large Object (#Stream)'
+    },
+    // Search Term #OPTable
+    {
+      purpose: #STANDARD,
+      type: #LINEITEM_REFERENCE,
+      targetElement: '_Grandchild',
+      label: 'Grandchild Entities (1..n)(#OPTable)'
+    }
+  ]
+  
+  @UI.hidden: true
+  ID;
+  
+  @UI.hidden: true
+  ParentID;
+  
+  @UI.lineItem: [{ position: 10 }] // Search Term #OPTable
+  StringProperty;
+  
+  @UI: { 
+    lineItem: [{ position: 20 }], // Search Term #OPTable
+    dataPoint: { 
+      title: 'Percentage property',
+      visualization: #NUMBER
+    }
+  }
+  FieldWithPercent;
+  
+  @UI: {
+    // Search Term #OPTable
+    lineItem: [
+      { 
+        position: 30,
+        criticality: 'CriticalityCode' 
+      }
+    ],
+    defaultValue: 'X'
+  }
+  BooleanProperty;
+  
+  // Search Term #Stream
+  @UI.hidden: true
+  StreamMimeType;
+  
+  @UI: {
+    lineItem: [{ position: 40, label: 'Attachment (#StreamTable)' }], // Search Term #StreamTable
+    fieldGroup: [{ position: 10, qualifier: 'Stream', label: 'Attachment (#Stream)' }] // Search Term #Stream
+  }
+  StreamFile;
+  
+  // Search Term #Stream
+  @UI.hidden: true
+  StreamFilename;
+}

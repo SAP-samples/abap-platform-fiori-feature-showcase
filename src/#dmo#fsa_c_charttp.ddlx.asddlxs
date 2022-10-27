@@ -1,0 +1,203 @@
+@Metadata.layer: #CORE
+
+// Search Term #LineItemHighlight
+@UI.lineItem: [{criticality: 'CriticalityCode'}]
+
+@UI.chart: [
+  // Search Term #AreaMicroChart
+  {
+    qualifier: 'areaChart',
+    title: 'Area Micro Chart (#AreaMicroChart)',
+    description: 'This is a micro chart',
+    chartType: #AREA,
+    dimensions: ['Dimensions'],
+    measures: ['IntegerValueForAreaChart'],
+    measureAttributes: [
+      {
+        measure: 'IntegerValueForAreaChart',
+        role: #AXIS_1,
+        asDataPoint: true
+      }
+    ]
+  },
+  // Search Term #LineMicroChart
+  {
+    qualifier: 'lineChart',
+    title: 'Line Micro Chart (#LineMicroChart)',
+    description: 'This is a micro chart',
+    chartType: #LINE,
+    measures: ['IntegerValueForLineChart', 'TargetValue'],
+    dimensions: ['Dimensions'],
+    measureAttributes: [
+      {
+        measure: 'IntegerValueForLineChart',
+        role: #AXIS_2,
+        asDataPoint: true
+      },
+      {
+        measure: 'TargetValue',
+        role: #AXIS_2,
+        asDataPoint: true
+      }
+    ]
+  },
+  // Search Term #ColumnMicroChart
+  {
+    qualifier: 'columnChart',
+    title: 'Column Micro Chart (#ColumnMicroChart)',
+    description: 'This is a micro chart',
+    chartType: #COLUMN,
+    measures: ['IntegerValueForOtherCharts'],
+    dimensions: ['Dimensions'],
+    measureAttributes: [
+      {
+        measure: 'IntegerValueForOtherCharts',
+        role: #AXIS_1,
+        asDataPoint: true
+      }
+    ]
+  },
+  // Search Term #StackedBarMicroChart
+  {
+    qualifier: 'stackedBarChart',
+    title: 'StackedBar MChart(#StackedBarMicroChart)',
+    description: 'This is a micro chart',
+    chartType: #BAR_STACKED,
+    measures: ['IntegerValueForOtherCharts'],
+    dimensions: ['Dimensions'],
+    measureAttributes: [
+      {
+        measure: 'IntegerValueForOtherCharts',
+        role: #AXIS_1,
+        asDataPoint: true
+      }
+    ]
+  },
+  // Search Term #ComparisonMicroChart
+  {
+    qualifier: 'comparisonChart',
+    title: 'Comparison MChart(#ComparisonMicroChart)',
+    description: 'This is a micro chart',
+    chartType: #BAR,
+    measures: ['IntegerValueForOtherCharts'],
+    dimensions: ['Dimensions'],
+    measureAttributes: [
+      {
+        measure: 'IntegerValueForOtherCharts',
+        role: #AXIS_1,
+        asDataPoint: true
+      }
+    ]
+  },
+  // Search Term #ChartSection
+  {
+    qualifier: 'Test',
+    title: 'Chart (#ChartSection)',
+    chartType: #COLUMN,
+    dimensions: ['Dimensions', 'CriticalityCode'],
+    measures: ['MaxAmount'],
+    dimensionAttributes: [
+      {
+        dimension: 'Dimensions',
+        role: #CATEGORY
+      },
+      {
+        dimension: 'CriticalityCode',
+        role: #CATEGORY
+      }
+    ],
+    measureAttributes: [
+      {
+        measure: 'MaxAmount',
+        role: #AXIS_1
+      }
+    ],
+    actions: [{ type: #FOR_ACTION, dataAction: 'updateChart', label: 'Action at Chart' }]
+  }
+]
+
+annotate entity /DMO/FSA_C_ChartTP with
+{
+  @UI.hidden: true
+  ID;
+
+  @UI.hidden: true
+  ParentID;
+
+  @UI: {
+    lineItem: [{ position: 10 }],
+    // Search Term #AreaMicroChart
+    dataPoint: {
+      qualifier: 'IntegerValueForAreaChart',
+      targetValueElement: 'IntegerValueForAreaChart',
+      criticalityCalculation: {
+        improvementDirection: #TARGET,
+        toleranceRangeLowValueElement: 'AreachartTolLowerboundValue',
+        toleranceRangeHighValueElement: 'AreachartTolUpperboundValue',
+        deviationRangeHighValueElement: 'AreachartDevUpperboundValue',
+        deviationRangeLowValueElement: 'AreachartDevLowerboundValue'
+      }
+    }
+  }
+  IntegerValueForAreaChart;
+
+  // Search Term #ColumnMicroChart, #StackedBarMicroChart, #ComparisonMicroChart
+  @UI.dataPoint: {
+    qualifier: 'IntegerValueForOtherCharts',
+    criticality: 'CriticalityCode'
+  }
+  IntegerValueForOtherCharts;
+
+  @UI.lineItem: [{ position: 20 }]
+  ForecastValue;
+
+  // Search Term #LineMicroChart
+  @UI: {
+    lineItem: [{ position: 30 }],
+    dataPoint: {
+      qualifier: 'TargetValue',
+      criticality: 'CriticalityCode'
+    }
+  }
+  TargetValue;
+
+  @UI.lineItem: [{ position: 40 }]
+  Dimensions;
+
+  // Search Term #LineMicroChart
+  @UI.dataPoint: {
+    qualifier: 'IntegerValueForLineChart',
+    criticality: 'CriticalityCode'
+  }
+  IntegerValueForLineChart;
+
+  // Search Term #ChartSection
+  @UI.valueCriticality: [
+    {
+      value: '1',
+      criticality: #NEGATIVE
+    },
+    {
+      value: '2',
+      criticality: #CRITICAL
+    },
+    {
+      value: '3',
+      criticality: #POSITIVE
+    }
+  ]
+  CriticalityCode;
+
+  //Search Term: #HideFilter
+  @Consumption.filter.hidden: true
+  AreachartTolUpperboundValue;
+
+  @Consumption.filter.hidden: true
+  AreachartTolLowerboundValue;
+
+  @Consumption.filter.hidden: true
+  AreachartDevUpperboundValue;
+
+  @Consumption.filter.hidden: true
+  AreachartDevLowerboundValue;
+}
