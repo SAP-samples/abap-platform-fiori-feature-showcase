@@ -1,0 +1,50 @@
+projection;
+strict ( 2 );
+use draft;
+
+define behavior for /DMO/FSA_C_RootTP alias Root
+{
+  use create;
+  use update;
+  use delete;
+
+  use action changeProgress;
+  use action changeCriticality;
+
+  use action Prepare;
+  use action Edit;
+  use action Activate;
+  use action Discard;
+  use action Resume;
+
+  use association _Chart { create; with draft; }
+  use association _Child { create; with draft; }
+}
+
+define behavior for /DMO/FSA_C_ChartTP alias Chart
+{
+  use update;
+  use delete;
+
+  use action updateChart;
+
+  use association _Root { with draft; }
+}
+
+define behavior for /DMO/FSA_C_ChildTP alias Child
+{
+  use update;
+  use delete;
+
+  use association _Root { with draft; }
+  use association _Grandchild { create; with draft; }
+}
+
+define behavior for /DMO/FSA_C_GrandchildTP alias Grandchild
+{
+  use update;
+  use delete;
+
+  use association _Root { with draft; }
+  use association _Child { with draft; }
+}

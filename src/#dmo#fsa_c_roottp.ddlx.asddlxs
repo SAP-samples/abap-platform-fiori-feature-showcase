@@ -1,0 +1,818 @@
+@Metadata.layer: #CORE
+
+// Search Term #HeaderInfo
+@UI.headerInfo: {
+    typeName: 'Object Page - Root',
+    typeNamePlural: 'Root Entities (#ListTableTitle)', // Search Term #ListTableTitle
+    typeImageUrl: 'sap-icon://sales-order',
+    imageUrl: 'ImageUrl',
+    title: {
+        value: 'StringProperty',
+        type: #STANDARD
+    },
+    description: {
+        label: 'Root entity',
+        type: #STANDARD,
+        value: 'StringProperty'
+    }
+}
+
+// Search Term #PresentationVariant
+@UI.presentationVariant: [
+  {
+    qualifier: 'pvariant',
+    text: '(#PresentationVariant)',
+    maxItems: 5,
+    // Search Term #DefaultSort
+    sortOrder: [
+      {
+        by: 'StringProperty',
+        direction: #ASC
+      }
+    ],
+    visualizations: [{type: #AS_LINEITEM}]
+  }
+]
+
+// Search Term #SelectionVariant
+@UI.selectionVariant: [
+  {
+    qualifier: 'svariant',
+    text: 'Criticality 0 - 2(#SelectionVariant)',
+    filter: 'CriticalityCode GE 0 and CriticalityCode LE 2'
+  }
+]
+
+// Search Term #SelectionPresentationVariant
+@UI.selectionPresentationVariant: [
+  {
+    text: '(#SelectionPresentationVariant)',
+    presentationVariantQualifier: 'pvariant',
+    selectionVariantQualifier: 'svariant'
+  }
+]
+
+@UI.chart: [
+  // Search Term #BulletMicroChart, #BulletMicroChartTable
+  {
+    qualifier: 'bulletChart',
+    title: 'Bullet Micro Chart (#BulletMicroChart)',
+    description: 'This is a micro chart',
+    chartType: #BULLET,
+    measures: ['IntegerValue'],
+    measureAttributes: [
+      {
+        measure: 'IntegerValue',
+        role: #AXIS_1,
+        asDataPoint: true
+      }
+    ]
+  },
+  // Search Term #RadialMicroChart, #RadialMicroChartTable
+  {
+    qualifier: 'radialChart',
+    title: 'Radial Micro Chart (#RadialMicroChart)',
+    description: 'This is a micro chart',
+    chartType: #DONUT,
+    measures: ['RadialIntegerValue'],
+    measureAttributes: [
+      {
+        measure: 'RadialIntegerValue',
+        role: #AXIS_1,
+        asDataPoint: true
+      }
+    ]
+  },
+  // Search Term #HarveyMicroChart
+  {
+    qualifier: 'harveyChart',
+    title: 'Harvey Micro Chart (#HarveyMicroChart)',
+    description: 'This is a micro chart',
+    chartType: #PIE,
+    measures: ['HarveyFieldWithPrice'],
+    measureAttributes: [
+      {
+        measure: 'HarveyFieldWithPrice',
+        role: #AXIS_1,
+        asDataPoint: true
+      }
+    ]
+  }
+]
+
+// Search Term #LineItemHighlight
+@UI.lineItem: [{criticality: 'CriticalityCode'}] // Annotation, so that the lineitem row has a criticality
+
+annotate entity /DMO/FSA_C_RootTP with
+{
+  @UI.facet: [
+    // OPHEADER
+    // Search Term #HeaderFacet, #KeyValue
+    {
+      purpose: #HEADER,
+      type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'fieldWithPrice'
+    },
+    // Search Term #HeaderCollectionFacet
+    {
+      purpose: #HEADER,
+      id: 'FacetCollection',
+      type: #COLLECTION
+    },
+    // Search Term #HeaderFieldGroup
+    {
+      parentId   : 'FacetCollection',
+      label      : 'General Data (#HeaderFieldGroup)',
+      type       : #FIELDGROUP_REFERENCE,
+      targetQualifier: 'HeaderData'
+    },
+    // Search Term #BulletMicroChart
+    {
+      parentId   : 'FacetCollection',
+      type       : #CHART_REFERENCE,
+      targetQualifier: 'bulletChart'
+    },
+    // Search Term #HeaderCollectionFacet
+    {
+      purpose: #HEADER,
+      type: #COLLECTION,
+      id: 'CollectionFacet1'
+    },
+    // Search Term #DataPointRating
+    {
+      parentId   : 'CollectionFacet1',
+      type       : #DATAPOINT_REFERENCE,
+      targetQualifier: 'StarsValue'
+    },
+    // Search Term #DataPointProgress
+    {
+      parentId   : 'CollectionFacet1',
+      type       : #DATAPOINT_REFERENCE,
+      targetQualifier: 'ProgressIntegerValue'
+    },
+    // Search Term #HeaderCollectionFacet
+    {
+      purpose: #HEADER,
+      type: #COLLECTION,
+      id: 'CollectionFacet2'
+    },
+    // Search Term #AreaMicroChart
+    {
+      parentId   : 'CollectionFacet2',
+      type       : #CHART_REFERENCE,
+      targetQualifier: 'areaChart',
+      targetElement: '_Chart'
+    },
+    // Search Term #RadialMicroChart
+    {
+      parentId   : 'CollectionFacet2',
+      type       : #CHART_REFERENCE,
+      targetQualifier: 'radialChart'
+    },
+    // Search Term #PlainText
+    {
+      purpose: #HEADER,
+      type: #FIELDGROUP_REFERENCE,
+      label: 'Plain Text (#PlainText)',
+      targetQualifier: 'plainText'
+    },
+    // Search Term #LineMicroChart
+    {
+      purpose: #HEADER,
+      type: #CHART_REFERENCE,
+      targetQualifier: 'lineChart',
+      targetElement: '_Chart'
+    },
+    // Search Term #ColumnMicroChart
+    {
+      purpose: #HEADER,
+      type: #CHART_REFERENCE,
+      targetQualifier: 'columnChart',
+      targetElement: '_Chart'
+    },
+    // Search Term #HarveyMicroChart
+    {
+      purpose: #HEADER,
+      type: #CHART_REFERENCE,
+      targetQualifier: 'harveyChart'
+    },
+    // Search Term #StackedBarMicroChart
+    {
+      purpose: #HEADER,
+      type: #CHART_REFERENCE,
+      targetQualifier: 'stackedBarChart',
+      targetElement: '_Chart'
+    },
+    // Search Term #ComparisonMicroChart
+    {
+      purpose: #HEADER,
+      type: #CHART_REFERENCE,
+      targetQualifier: 'comparisonChart',
+      targetElement: '_Chart'
+    },
+
+    // OPSTANDARD
+    // Search Term #OPSection
+    {
+      purpose: #STANDARD,
+      type: #COLLECTION,
+      label: 'Collection Facet (#OPSection)',
+      id: 'collectionFacetSection'
+    },
+    // Search Term #OPForm
+    {
+      parentId   : 'collectionFacetSection',
+      label      : 'FieldGroup (#OPForm)',
+      type       : #FIELDGROUP_REFERENCE,
+      targetQualifier: 'OPForm',
+      id: 'SubSectionID'
+    },
+    // Search Term #Location
+    {
+      parentId   : 'collectionFacetSection',
+      label      : 'Location Subsection (#Location)',
+      type       : #FIELDGROUP_REFERENCE,
+      targetQualifier: 'location'
+    },
+    // Search Term #Communication
+    {
+      parentId   : 'collectionFacetSection',
+      label      : 'Communication Subsection(#Communication)',
+      type       : #FIELDGROUP_REFERENCE,
+      targetQualifier: 'communication'
+    },
+    // Search Term #TimeAndDate
+    {
+      parentId   : 'collectionFacetSection',
+      label      : 'Time and Date (#TimeAndDate)',
+      type       : #FIELDGROUP_REFERENCE,
+      targetQualifier: 'timeAndDate'
+    },
+    // Search Term #HidingContent
+    {
+      type: #FIELDGROUP_REFERENCE,
+      label: 'Visible when in Edit(#HidingContent)',
+      targetQualifier: 'ShowWhenInEdit',
+      hidden: #( IsActiveEntity )
+    },
+    // Search Term #MicroChartDataSection
+    {
+      purpose: #STANDARD,
+      type: #COLLECTION,
+      label: 'Micro Chart Data(#MicroChartDataSection)',
+      id: 'chartDataCollection'
+    },
+    // Search Term #ChartForm
+    {
+      parentId   : 'chartDataCollection',
+      label      : 'Micro Chart Data (#ChartForm)',
+      type       : #FIELDGROUP_REFERENCE,
+      targetQualifier: 'chartData'
+    },
+    // Search Term #Preview
+    {
+      parentId   : 'chartDataCollection',
+      label      : 'Chart Data Preview (#Preview)',
+      type       : #FIELDGROUP_REFERENCE,
+      targetQualifier: 'chartDataPreview',
+      isPartOfPreview: false
+    },
+    // Search Term #OPTable, #PresentationVariant-Child, #SelectionPresentationVariant-Child, #SelectionVariant-Child
+    {
+      purpose: #STANDARD,
+      type: #SELECTIONPRESENTATIONVARIANT_REFERENCE,
+      targetElement: '_Child',
+      targetQualifier: 'ChildSP',
+      label: 'Child Entity (1..n)(#OPTable)',
+      id: 'childEntitiesSection'
+    },
+    // Search Term #NavigationSection
+    {
+      purpose: #STANDARD,
+      type: #FIELDGROUP_REFERENCE,
+      targetElement: '_Navigation',
+      targetQualifier: 'data',
+      label: 'Navigation (1..1)(#NavigationSection)'
+    },
+  //    // Search term #ChartSection
+  //    {
+  //      id: 'chart',
+  //      purpose: #STANDARD,
+  //      type: #CHART_REFERENCE,
+  //      targetElement: '_Chart',
+  //      label: 'Chart (#ChartSection)'
+  //    },
+    // Search term #FilterGrouping
+    {
+      purpose: #FILTER,
+      type: #FIELDGROUP_REFERENCE,
+      targetQualifier: 'chartData',
+      label: 'Chart Data (#FilterGrouping)'
+    },
+    // Search term #FilterGrouping, #Location
+    {
+      purpose: #FILTER,
+      type: #FIELDGROUP_REFERENCE,
+      targetQualifier: 'location',
+      label: 'Location (#FilterGrouping)'
+    }
+  ]
+
+  // Search Term #OPHeaderAction
+  @UI.identification: [
+    {
+      type: #FOR_ACTION,  //Action in the RootEntities of the object page next to the edit button
+      label: 'Change Criticality (#OPHeaderAction)',
+      criticality: 'CriticalityCode',
+      criticalityRepresentation: #WITH_ICON,
+      dataAction: 'changeCriticality'
+    }
+  ]
+
+  @UI.hidden: true
+  ID;
+
+  // Search Term #Image
+  @UI.lineItem: [{
+    cssDefault.width: '5em',
+    position: 10,
+    importance: #HIGH,
+    label: '(#Image)'
+  }]
+  @EndUserText.quickInfo: '(#Image)'
+  ImageUrl;
+
+  @UI: {
+    lineItem: [
+      {
+        position: 20,
+        importance: #HIGH,
+        label: 'Field with Sem. Key(#SemanticKey)'
+      }
+    ],
+    // Search Term #VisibleFilters
+    selectionField: [{ position: 10 }],
+    fieldGroup: [
+      // Search Term #HidingContent
+      {
+        qualifier: 'ShowWhenInEdit',
+        label: 'Field with Sem. Key(#SemanticKey)'
+      },
+      // Search Term #HeaderFieldGroup
+      {
+        qualifier: 'HeaderData',
+        position: 10,
+        label: 'Field with Sem. Key(#SemanticKey)'
+      }
+    ],
+    // Search Term #MultiLineText
+    multiLineText: true
+  }
+  @EndUserText.label: 'Semantic Key(#VisibleFilters)'
+  StringProperty;
+
+  @UI: {
+    fieldGroup: [
+      { qualifier: 'chartData' }, // Search term #FilterGrouping
+      { qualifier: 'chartDataPreview' }, // Search Term #Preview
+      // Search Term #ConnectedFields
+      {
+        qualifier: 'OPForm',
+        type: #AS_CONNECTED_FIELDS,
+        valueQualifier: 'ConnectedFields',
+        position: 10
+      }
+    ],
+    // Search Term #ConnectedFields
+    connectedFields: [
+      {
+        qualifier: 'ConnectedFields',
+        groupLabel: 'Connected Fields (#ConnectedFields)',
+        name: 'integer',
+        template: '{integer} / {target}'
+      }
+    ],
+    // Search Term: #BulletMicroChart, #BulletMicroChartTable
+    dataPoint: {
+      qualifier: 'IntegerValue', //IntegerValue: horizontal bar in relation to the goal line
+      targetValueElement: 'TargetValue', //visual goal line in the UI
+      forecastValue: 'ForecastValue', //horizontal bar behind the value bar with, slightly larger with higher transparency
+      criticality: 'CriticalityCode',
+      minimumValue: 0 //Minimal value, needed for output rendering
+    },
+    // Search Term #BulletMicroChartTable
+    lineItem: [{
+      type: #AS_CHART,
+      label: 'Bullet Chart (#BulletMicroChartTable)',
+      valueQualifier: 'bulletChart',
+      importance: #HIGH,
+      position: 80
+    }]
+  }
+  @EndUserText.quickInfo: 'Bullet Chart (#BulletMicroChart)'
+  IntegerValue;
+
+  // Search Term #DataPointProgress, #DataPointProgressTable
+  @UI: {
+    dataPoint: {
+      qualifier: 'ProgressIntegerValue',
+      targetValue: 100,
+      visualization: #PROGRESS,
+      criticality: 'CriticalityCode',
+      title: 'Progress Indicator (#DataPointProgress)'
+    },
+    // Search Term #DataPointProgressTable
+    lineItem: [
+      {
+        type:#AS_DATAPOINT,
+        label: 'Progress Ind. (#DataPointProgressTable)',
+        importance: #LOW,
+        position: 60
+      }
+    ]
+  }
+  ProgressIntegerValue;
+
+  // Search Term #RadialMicroChart, #RadialMicroChartTable
+  @UI: {
+    dataPoint: {
+      qualifier: 'RadialIntegerValue',
+      targetValueElement: 'TargetValue', //The relation between the value and the target value will be displayed as a percentage
+      criticality: 'CriticalityCode'
+    },
+    // Search Term #RadialMicroChartTable
+    lineItem: [
+      {
+        type: #AS_CHART,
+        label: 'Radial Chart (#RadialMicroChartTable)',
+        valueQualifier: 'radialChart',
+        position: 110
+      }
+    ]
+  }
+  RadialIntegerValue;
+
+  @UI.fieldGroup: [
+    { qualifier: 'chartData' }, // Search term #FilterGrouping
+    { qualifier: 'chartDataPreview' } // Search Term #Preview
+  ]
+  ForecastValue;
+
+  @UI: {
+    fieldGroup: [{ qualifier: 'chartData' }], // Search term #FilterGrouping
+    // Search Term #ConnectedFields
+    connectedFields: [
+      {
+        qualifier: 'ConnectedFields',
+        name: 'target'
+      }
+    ],
+    defaultValue: '30'
+  }
+  TargetValue;
+
+  // Search term #FilterGrouping
+  @UI.fieldGroup: [{ qualifier: 'chartData'  }]
+  Dimensions;
+
+  @UI: { 
+    // Search Term #DataPointRating, #DataPointRatingTable
+    dataPoint: {
+      qualifier: 'StarsValue',
+      targetValue: 4,
+      visualization: #RATING,
+      title: 'Rating Indicator (#DataPointRating)'
+    },
+    // Search Term #DataPointRatingTable
+    lineItem: [
+      {
+        type: #AS_DATAPOINT,
+        label: 'Rating Indicator (#DataPointRatingTable)',
+        importance: #LOW,
+        position: 70
+      }
+    ],
+    // Search Term #HidingContent
+    fieldGroup: [{ 
+      qualifier: 'ShowWhenInEdit', 
+      type: #AS_DATAPOINT,
+      label: 'Edit Rating Indicator'
+    }]
+  }
+  StarsValue;
+
+  @UI: {
+    textArrangement: #TEXT_ONLY,
+    fieldGroup: [
+      { qualifier: 'ShowWhenInEdit' }, // Search Term #HidingContent
+      // Search Term #ContactInHeader, #HeaderFieldGroup
+      {
+        qualifier: 'HeaderData',
+        type: #AS_CONTACT,
+        label: 'Contact QuickView (#ContactInHeader)',
+        position: 50,
+        value: '_Contact'
+      }
+    ],
+    // Search Term #ContactInLineItem
+    lineItem: [
+      {
+        type: #AS_CONTACT,
+        label: 'Contact QuickView (#ContactInLineItem)',
+        value: '_Contact',
+        position: 120
+      }
+    ]
+  }
+  ContactID;
+
+  @UI: {
+    textArrangement: #TEXT_FIRST, // Search Term #DisplayTextAndID
+    // Search Term #VisibleFilters
+    selectionField: [{ position: 40 }],
+    // Search Term #HidingContent
+    fieldGroup: [
+      {
+        qualifier: 'ShowWhenInEdit',
+        label: 'Criticality'
+      }
+    ]
+  }
+  @EndUserText.label: 'Criticality (#VisibleFilters)'
+  //  @Consumption.filter.defaultValue: '3' // Search term #FilterDefault
+  CriticalityCode;
+
+  @UI.hidden: true
+  Uom;
+
+  @UI: {
+    lineItem: [
+      {
+        position: 40,
+        importance: #LOW
+      }
+    ],
+    fieldGroup: [
+      { qualifier: 'ShowWhenInEdit' }, // Search Term #HidingContent
+      // Search Term #HeaderFieldGroup
+      {
+        qualifier: 'HeaderData',
+        position: 30
+      }
+    ]
+  }
+  FieldWithQuantity;
+
+  // Search Term #VisibleFilters
+  @UI.selectionField: [{ position: 30 }]
+  @EndUserText.label: 'Currency (#VisibleFilters)'
+  IsoCurrency;
+
+  @UI: {
+    lineItem: [
+      {
+        position: 30,
+        importance: #HIGH
+      }
+    ],
+    // Search Term #VisibleFilters
+    selectionField: [{ position: 20 }],
+    // Search Term #HidingContent
+    fieldGroup: [
+      {
+        qualifier: 'ShowWhenInEdit',
+        label: 'Property with Currency (#Unit)'
+      }
+    ],
+    // Search Term #HeaderFacet, #KeyValue
+    dataPoint: {
+      qualifier: 'fieldWithPrice',
+      title: 'Field with Price (#HeaderFacet)'
+    }
+  }
+  @EndUserText.label: 'Property with Currency (#VisibleFilters)'
+  @EndUserText.quickInfo: 'Property with currency(#Unit)'
+  FieldWithPrice;
+
+  //Search-Term: #HarveyMicroChart
+  @UI.dataPoint: {
+    qualifier: 'HarveyFieldWithPrice',
+  //    maximumValue: #(FieldWithQuantity),
+    maximumValue: 5000.00,
+    criticality: 'CriticalityCode',
+    valueFormat.numberOfFractionalDigits: 2
+  }
+  HarveyFieldWithPrice;
+
+
+  @UI: {
+    lineItem: [
+      {
+        position: 50,
+        criticality: 'CriticalityCode',
+        criticalityRepresentation: #WITH_ICON,
+        importance: #LOW
+      }
+    ],
+    fieldGroup: [
+      { qualifier: 'ShowWhenInEdit' }, // Search Term #HidingContent
+      // Search Term #HeaderFieldGroup
+      {
+        qualifier: 'HeaderData',
+        criticality: 'CriticalityCode',
+        position: 20
+      }
+    ]
+  }
+  FieldWithCriticality;
+
+  @UI.hidden: true
+  DeleteHidden;
+
+  @UI.hidden: true
+  UpdateHidden;
+
+  @UI.hidden: true
+  FieldWithUrl;
+
+  // Search Term #Navigation-URL
+  @UI.lineItem: [
+    {
+      url: 'FieldWithUrl', //Target, when pressing the text
+      label: 'URL Property (#Navigation-URL)',
+      type: #WITH_URL,
+      importance: #MEDIUM,
+      position: 130
+    }
+  ]
+  @Consumption.filter.hidden: true //Search Term: #HideFilter
+  FieldWithUrlText; //Visible text
+
+  @UI: {
+    textArrangement: #TEXT_FIRST, // Search Term #DisplayTextAndID
+    // Search term #FilterGrouping, #Location
+    fieldGroup: [{ qualifier: 'location', position: 10, label: 'Country (#CollectiveValueHelp)' }]
+  }
+  Country;
+
+  @UI: {
+    textArrangement: #TEXT_FIRST, // Search Term #DisplayTextAndID
+    // Search term #FilterGrouping, #Location
+    fieldGroup: [{ qualifier: 'location', position: 20 }]
+  }
+  Region;
+
+  @UI.fieldGroup: [{ qualifier: 'communication' }] // Search Term #Communication
+  Email;
+
+  @UI.fieldGroup: [{ qualifier: 'communication' }] // Search Term #Communication
+  Telephone;
+
+  @UI.fieldGroup: [{ qualifier: 'timeAndDate' }] // Search Term #TimeAndDate
+  ValidTo;
+
+  @UI.fieldGroup: [{ qualifier: 'timeAndDate' }] // Search Term #TimeAndDate
+  Time;
+
+  @UI.fieldGroup: [{ qualifier: 'timeAndDate' }] // Search Term #TimeAndDate
+  Timestamp;
+
+  @UI: {
+    fieldGroup: [
+      // Search Term #PlainText
+      { qualifier: 'plainText' },
+      {
+        qualifier: 'OPForm',
+        position: 20,
+        label: 'Description (#MultiLineText)'
+      }
+    ],
+    // Search Term #MultiLineText
+    multiLineText: true
+    ,defaultValue: 'Test default value'
+  }
+  Description;
+
+  @UI: {
+    // Search Term #MultiLineText
+    multiLineText: true,
+    fieldGroup: [
+      {
+        qualifier: 'OPForm',
+        position: 30,
+        label: 'Second Description (#MultiLineText)'
+      }
+    ]
+  }
+  DescriptionCustomGrowing;
+
+  @Consumption.semanticObject: 'FeatureShowcaseNavigation'
+  @UI: {
+    fieldGroup: [
+      { qualifier: 'ShowWhenInEdit' }, // Search Term #HidingContent
+      // Search Term #HeaderFieldGroup, #QuickView
+      {
+        qualifier: 'HeaderData',
+        position: 40,
+        label: 'Navigation (#QuickView)'
+      },
+      // Search Term #SectionNavigation ( Button )
+      {
+        qualifier: 'OPForm',
+        label: 'IntentBased Navi (#SectionNavigation)',
+        type: #FOR_INTENT_BASED_NAVIGATION,
+        semanticObjectAction: 'manage'
+      },
+      // Search Term #FormNavigation ( Link )
+      {
+        qualifier: 'OPForm',
+        label: 'IntentBased Navi (#FormNavigation)',
+        type: #WITH_INTENT_BASED_NAVIGATION,
+        value: 'NavigationID',
+        semanticObjectAction: 'manage',
+        position: 50
+      }
+    ],
+    lineItem: [
+      // Search Tern #QuickView
+      {
+        label: 'Navigation (#QuickView)',
+        importance: #HIGH,
+        position: 90
+      }
+      ,
+      // Search Tern #Navigation-IBN
+      {
+        label: 'IntentBased Navigation (#NavAction-IBN)',
+        type: #FOR_INTENT_BASED_NAVIGATION,
+        semanticObjectAction: 'manage',
+        requiresContext: true
+      }
+    ],
+    textArrangement: #TEXT_ONLY
+  }
+  NavigationID;
+
+  @UI.fieldGroup: [{ qualifier: 'AdminData' }] // Search Term #MultiFieldsCol
+  CreatedAt;
+
+  @UI.fieldGroup: [{ qualifier: 'AdminData' }] // Search Term #MultiFieldsCol
+  LocalLastChangedBy;
+
+  @UI.fieldGroup: [{ qualifier: 'AdminData' }] // Search Term #MultiFieldsCol
+  LocalLastChangedAt;
+  
+  // Search Term #MultiFieldsCol
+  @UI: { 
+    fieldGroup: [{ qualifier: 'AdminData' }],
+    lineItem: [
+      {
+        type: #AS_FIELDGROUP,
+        label: 'Admin Data (#MultiFieldsCol)',
+        valueQualifier: 'AdminData',
+        importance: #HIGH,
+        position: 100
+      }
+    ]
+  }
+  CreatedBy;
+
+  @UI: {
+    lineItem: [
+      // Search Term #ActionInLineItem
+      {
+        type:#FOR_ACTION,
+        label: 'Change Criticality (#ActionInLineItem)',
+        dataAction: 'changeCriticality',
+        position: 10
+      }
+    ],
+
+    // Search Term #ActionInSection
+    fieldGroup: [
+      {
+        qualifier: 'OPForm',
+        dataAction: 'changeProgress',
+        type: #FOR_ACTION,
+        emphasized: true,
+  //        iconUrl: 'sap-icon://sales-order', //no effect
+  //        criticality: 'CriticalityCode', //no effect
+  //        criticalityRepresentation: #WITH_ICON, //no effect
+        label: 'Change Progress (#ActionInSection)'
+      }
+    ]
+  }
+  LastChangedAt;
+
+  // Search Term #MultiInputField
+  @UI.fieldGroup: [
+    {
+      label: 'Multi Input Field (#MultiInputField)',
+      qualifier: 'OPForm',
+      value: '_Child.StringProperty',
+      position: 40
+    }
+  ]
+  _Child;
+  
+}

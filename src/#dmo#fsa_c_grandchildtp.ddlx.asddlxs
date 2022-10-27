@@ -1,0 +1,14 @@
+@Metadata.layer: #CORE
+
+annotate entity /DMO/FSA_C_GrandchildTP
+  with 
+{
+  @UI.hidden: true
+  ID;
+  
+  @UI.hidden: true
+  ParentID;
+  
+  @UI.lineItem: [{ position: 10 }] // Search Term #OPTable
+  StringProperty;
+}

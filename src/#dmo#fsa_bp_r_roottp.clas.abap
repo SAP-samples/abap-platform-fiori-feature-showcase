@@ -1,0 +1,5 @@
+CLASS /dmo/fsa_bp_r_roottp DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF /dmo/fsa_r_roottp.
+ENDCLASS.
+
+CLASS /dmo/fsa_bp_r_roottp IMPLEMENTATION.
+ENDCLASS.
