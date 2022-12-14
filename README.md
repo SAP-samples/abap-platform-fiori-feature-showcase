@@ -1,4 +1,4 @@
-# Fiori Element Feature Showcase App for the ABAP RESTful Application Programming Model
+# SAP Fiori Element Feature Showcase App for the ABAP RESTful Application Programming Model
 ![App List Report](/Images/app-list.jpg)
 ![App Object Page](/Images/app-objectpage.jpg)
 
