@@ -32,8 +32,12 @@ To import the feature showcase app into your ABAP system, follow the steps in th
 
 * [README](../ABAP-platform-2022/README.md) of branch <em>ABAP-platform-2022</em> (Application Server ABAP 7.57)
 
+## SAP BTP ABAP Environment Trial
+
+If you don’t have a system available, you could also try it out in the SAP BTP ABAP Environment Trial systems. Check out this [tutorial](https://developers.sap.com/tutorials/abap-environment-trial-onboarding.html) on how to get a trail user.
+
 ## How to obtain support
 This project is provided "as-is": there is no guarantee that raised issues will be answered or addressed in future releases.
 
 ## License
-Copyright (c) 2022 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](LICENSE) file.
+Copyright (c) 2022 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](/LICENSES/Apache-2.0.txt) file.
