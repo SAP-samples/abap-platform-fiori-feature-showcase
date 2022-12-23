@@ -34,7 +34,7 @@ To import the feature showcase app into your ABAP system, follow the steps in th
 
 ## SAP BTP ABAP Environment Trial
 
-If you don’t have a system available, you could also try it out in the SAP BTP ABAP Environment Trial systems. Check out this [tutorial](https://developers.sap.com/tutorials/abap-environment-trial-onboarding.html) on how to get a trail user.
+If you don’t have a system available, you could also try it out in the SAP BTP ABAP Environment Trial systems. Check out this [tutorial](https://developers.sap.com/tutorials/abap-environment-trial-onboarding.html) on how to get a trial user.
 
 ## How to obtain support
 This project is provided "as-is": there is no guarantee that raised issues will be answered or addressed in future releases.
