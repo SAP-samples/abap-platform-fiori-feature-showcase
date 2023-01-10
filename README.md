@@ -1,3 +1,5 @@
+[![REUSE status](https://api.reuse.software/badge/github.com/sap-samples/abap-platform-fiori-feature-showcase)](https://api.reuse.software/info/github.com/sap-samples/abap-platform-fiori-feature-showcase)
+
 # Fiori Element Feature Showcase App for the ABAP RESTful Application Programming Model
 ![App List Report](/Images/app-list.jpg)
 ![App Object Page](/Images/app-objectpage.jpg)
