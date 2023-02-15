@@ -1,6 +1,6 @@
 [![REUSE status](https://api.reuse.software/badge/github.com/sap-samples/abap-platform-fiori-feature-showcase)](https://api.reuse.software/info/github.com/sap-samples/abap-platform-fiori-feature-showcase)
 
-# Fiori Element Feature Showcase App for the ABAP RESTful Application Programming Model
+# SAP Fiori Element Feature Showcase App for the ABAP RESTful Application Programming Model
 ![App List Report](/../main/Images/app-list.jpg)
 ![App Object Page](/../main/Images/app-objectpage.jpg)
 
@@ -69,6 +69,8 @@ As a result of the installation procedure above, the ABAP system creates an inac
 
 NOTE: The service binding of the app is imported with the warning: `To enable activation of local service endpoint, generate service artifacts`. 
 
+NOTE: If you pull the repository again after a successfull import, make sure that you do not delete the local objects `G4BA`, `SUSH` and `NSPC`.
+
 ## Configuration
 To generate service artifacts for the service binding `/DMO/UI_FEATURESHOWCASEAPP`:
 1. Choose the button `Publish` or choose `Publish local service endpoint` in the top right corner of the editor.
@@ -83,4 +85,4 @@ NOTE: The namespace /DMO/ is reserved for the demo content. Apart from the downl
 This project is provided "as-is": there is no guarantee that raised issues will be answered or addressed in future releases.
 
 ## License
-Copyright (c) 2022 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](LICENSE) file.
+Copyright (c) 2022 - 2023 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](LICENSE) file.
