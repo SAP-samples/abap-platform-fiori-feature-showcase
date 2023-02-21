@@ -1,6 +1,6 @@
 [![REUSE status](https://api.reuse.software/badge/github.com/sap-samples/abap-platform-fiori-feature-showcase)](https://api.reuse.software/info/github.com/sap-samples/abap-platform-fiori-feature-showcase)
 
-# Fiori Element Feature Showcase App for the ABAP RESTful Application Programming Model
+# SAP Fiori Element Feature Showcase App for the ABAP RESTful Application Programming Model
 ![App List Report](/Images/app-list.jpg)
 ![App Object Page](/Images/app-objectpage.jpg)
 
@@ -36,10 +36,10 @@ To import the feature showcase app into your ABAP system, follow the steps in th
 
 ## SAP BTP ABAP Environment Trial
 
-If you don’t have a system available, you could also try it out in the SAP BTP ABAP Environment Trial systems. Check out this [tutorial](https://developers.sap.com/tutorials/abap-environment-trial-onboarding.html) on how to get a trail user.
+If you don’t have a system available, you could also try it out in the SAP BTP ABAP Environment Trial systems. Check out this [tutorial](https://developers.sap.com/tutorials/abap-environment-trial-onboarding.html) on how to get a trial user.
 
 ## How to obtain support
 This project is provided "as-is": there is no guarantee that raised issues will be answered or addressed in future releases.
 
 ## License
-Copyright (c) 2022 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](/LICENSES/Apache-2.0.txt) file.
+Copyright (c) 2022 - 2023 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](/LICENSES/Apache-2.0.txt) file.
