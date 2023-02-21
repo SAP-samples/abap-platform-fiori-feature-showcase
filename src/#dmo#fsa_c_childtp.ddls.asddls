@@ -16,6 +16,8 @@ define view entity /DMO/FSA_C_ChildTP
       FieldWithPercent,
       BooleanProperty,
       CriticalityCode,
+      ChildPieces,
+      
       StreamFilename, // Search Term #Stream
       
       // Search Term #Stream

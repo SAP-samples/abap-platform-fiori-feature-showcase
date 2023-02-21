@@ -1,3 +1,48 @@
+CLASS lhc_child DEFINITION INHERITING FROM cl_abap_behavior_handler.
+
+  PRIVATE SECTION.
+
+    METHODS calculateTotalPieces FOR DETERMINE ON MODIFY
+      IMPORTING keys FOR Child~calculateTotalPieces.
+
+    METHODS get_instance_features FOR INSTANCE FEATURES
+      IMPORTING keys REQUEST requested_features FOR Child RESULT result.
+
+ENDCLASS.
+
+CLASS lhc_child IMPLEMENTATION.
+
+  METHOD calculateTotalPieces.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Child BY \_Root
+        FIELDS ( ID  )
+        WITH CORRESPONDING #(  keys  )
+      RESULT DATA(roots).
+
+    MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+        EXECUTE calcTotalPieces
+          FROM CORRESPONDING #( roots ).
+
+  ENDMETHOD.
+
+  METHOD get_instance_features.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Child
+        FIELDS ( BooleanProperty )
+        WITH CORRESPONDING #(  keys  )
+      RESULT DATA(children).
+
+    result = VALUE #( FOR child IN children
+                        ( %tky      = child-%tky
+                          %delete   = COND #( WHEN child-BooleanProperty  = abap_true
+                                                THEN if_abap_behv=>fc-o-enabled
+                                                ELSE if_abap_behv=>fc-o-disabled  )
+                         ) ).
+  ENDMETHOD.
+
+ENDCLASS.
+
 CLASS lhc_Root DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
     TYPES: tt_criticality TYPE STANDARD TABLE OF /dmo/fsa_critlty WITH DEFAULT KEY.
@@ -20,8 +65,23 @@ CLASS lhc_Root DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS get_instance_features FOR INSTANCE FEATURES
       IMPORTING keys REQUEST requested_features FOR Root RESULT result.
 
+    METHODS resetTimesChildCreated FOR MODIFY
+      IMPORTING keys FOR ACTION Root~resetTimesChildCreated.
+
+    METHODS calcTotalPieces FOR MODIFY
+      IMPORTING keys FOR ACTION Root~calcTotalPieces.
+
+    METHODS increaseTimesChildCreated FOR MODIFY
+      IMPORTING keys FOR ACTION Root~increaseTimesChildCreated.
+
+    METHODS validateValidTo FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Root~validateValidTo.
+
     METHODS get_all_criticality
       RETURNING VALUE(rt_criticality) TYPE tt_criticality.
+
+    METHODS validatePercentage FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Child~validatePercentage.
 
 ENDCLASS.
 
@@ -38,9 +98,9 @@ CLASS lhc_Root IMPLEMENTATION.
         UPDATE
           FIELDS ( CriticalityCode FieldWithCriticality )
           WITH VALUE #( FOR key IN keys
-                          ( %tky = key-%tky
-                            CriticalityCode  = key-%param-criticality_code
-                            FieldWithCriticality = lt_criticality[ code = key-%param-criticality_code ]-name ) )
+                          ( %tky                  = key-%tky
+                            CriticalityCode       = key-%param-criticality_code
+                            FieldWithCriticality  = lt_criticality[ code = key-%param-criticality_code ]-name ) )
       FAILED failed
       REPORTED reported.
 
@@ -78,18 +138,20 @@ CLASS lhc_Root IMPLEMENTATION.
   METHOD setIntegerValue.
     READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
       ENTITY Root
-        FIELDS ( ProgressIntegerValue )
+        FIELDS ( IntegerValue )
         WITH CORRESPONDING #( keys )
       RESULT DATA(roots).
 
     MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
       ENTITY Root
         UPDATE
-          FIELDS ( IntegerValue )
+          FIELDS ( ProgressIntegerValue RadialIntegerValue )
           WITH VALUE #( FOR root IN roots
-                          ( %tky = root-%tky
-                            IntegerValue  = root-ProgressIntegerValue
-                            %control-IntegerValue = if_abap_behv=>mk-on ) )
+                          ( %tky                          = root-%tky
+                            ProgressIntegerValue          = root-IntegerValue
+                            RadialIntegerValue            = root-IntegerValue
+                            %control-ProgressIntegerValue = if_abap_behv=>mk-on
+                            %control-RadialIntegerValue   = if_abap_behv=>mk-on ) )
       FAILED DATA(upd_failed)
       REPORTED DATA(upd_reported).
 
@@ -117,7 +179,7 @@ CLASS lhc_Root IMPLEMENTATION.
 
     LOOP AT lt_chart ASSIGNING FIELD-SYMBOL(<fs_chart>).
       <fs_chart>-Dimensions = ls_dimension.
-      ls_dimension = ls_dimension + 2.
+      ls_dimension += 2.
       CLEAR: <fs_chart>-Id, <fs_chart>-ParentId.
     ENDLOOP.
 
@@ -126,12 +188,14 @@ CLASS lhc_Root IMPLEMENTATION.
       ENTITY Root
         UPDATE
           FIELDS ( FieldWithCriticality )
-          WITH VALUE #( FOR root IN roots ( %tky = root-%tky
-                                            FieldWithCriticality = lt_criticality[ code = root-CriticalityCode ]-name
-                                            %control-FieldWithCriticality = if_abap_behv=>mk-on ) )
+          WITH VALUE #( FOR root IN roots
+                          ( %tky                          = root-%tky
+                            FieldWithCriticality          = lt_criticality[ code = root-CriticalityCode ]-name
+                            %control-FieldWithCriticality = if_abap_behv=>mk-on ) )
         CREATE BY \_Chart
-        AUTO FILL CID WITH VALUE #( FOR root IN roots ( %tky = root-%tky
-                                                        %target = CORRESPONDING #( lt_chart CHANGING CONTROL ) ) ).
+          AUTO FILL CID WITH VALUE #( FOR root IN roots
+                                        ( %tky = root-%tky
+                                          %target = CORRESPONDING #( lt_chart CHANGING CONTROL ) ) ).
   ENDMETHOD.
 
   METHOD get_all_criticality.
@@ -143,19 +207,155 @@ CLASS lhc_Root IMPLEMENTATION.
   METHOD get_instance_features.
     READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
       ENTITY Root
-        FIELDS ( DeleteHidden ) WITH CORRESPONDING #( keys )
+        FIELDS ( UpdateHidden DeleteHidden TimesChildCreated ) WITH CORRESPONDING #( keys )
       RESULT DATA(roots)
       FAILED failed.
 
-    result =
-      VALUE #(
-        FOR root IN roots
-          LET is_deletable =   COND #( WHEN root-DeleteHidden  = abap_true
-                                        THEN if_abap_behv=>fc-o-disabled
-                                        ELSE if_abap_behv=>fc-o-enabled  )
-          IN ( %tky      = root-%tky
-               %delete  = is_deletable )
-      ).
+    result = VALUE #( FOR root IN roots
+                        ( %tky = root-%tky
+                          %delete                         = COND #( WHEN root-DeleteHidden  = abap_true
+                                                                      THEN if_abap_behv=>fc-o-disabled
+                                                                       ELSE if_abap_behv=>fc-o-enabled  )
+                          %field-TimesChildCreated        = if_abap_behv=>fc-f-read_only
+                          %field-TotalPieces              = if_abap_behv=>fc-f-read_only
+                          %action-changeProgress          = COND #( WHEN root-UpdateHidden  = abap_true
+                                                                      THEN if_abap_behv=>fc-o-disabled
+                                                                      ELSE if_abap_behv=>fc-o-enabled )
+                          %action-changeCriticality       = COND #( WHEN root-UpdateHidden  = abap_true
+                                                                      THEN if_abap_behv=>fc-o-disabled
+                                                                      ELSE if_abap_behv=>fc-o-enabled  )
+                          %action-resetTimesChildCreated  = COND #( WHEN root-UpdateHidden  = abap_true OR root-TimesChildCreated = 0
+                                                                      THEN if_abap_behv=>fc-o-disabled
+                                                                      ELSE if_abap_behv=>fc-o-enabled  )
+
+                         ) ).
+  ENDMETHOD.
+
+  METHOD resetTimesChildCreated.
+    MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+      UPDATE
+          FIELDS ( TimesChildCreated )
+          WITH VALUE #( FOR key IN keys
+                          ( %tky                        = key-%tky
+                            TimesChildCreated           = 0
+                            %control-TimesChildCreated  = if_abap_behv=>mk-on ) )
+        FAILED failed
+        REPORTED reported.
+
+    LOOP AT keys ASSIGNING FIELD-SYMBOL(<key>).
+
+      APPEND VALUE #( %tky        = <key>-%tky
+                      %msg        = new_message( id       = '/DMO/CM_FSA'
+                                                 number   = 003
+                                                 severity = if_abap_behv_message=>severity-success )
+                      %action-resetTimesChildCreated = if_abap_behv=>mk-on ) TO reported-root.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD calcTotalPieces.
+    DATA: lv_total TYPE /DMO/FSA_R_RootTP-TotalPieces.
+
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+        FIELDS ( TotalPieces ) WITH CORRESPONDING #( keys )
+      RESULT DATA(roots)
+      ENTITY Root BY \_Child
+        FIELDS ( ChildPieces ) WITH CORRESPONDING #( keys )
+      RESULT DATA(children).
+
+    LOOP AT roots ASSIGNING FIELD-SYMBOL(<root>).
+      CLEAR <root>-TotalPieces.
+
+      LOOP AT children ASSIGNING FIELD-SYMBOL(<child>)
+        WHERE ParentID = <root>-%tky-id.
+        <root>-TotalPieces += <child>-ChildPieces.
+      ENDLOOP.
+    ENDLOOP.
+
+    MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+        UPDATE
+          FIELDS ( TotalPieces )
+          WITH CORRESPONDING #( roots )
+      FAILED failed
+      REPORTED reported.
+  ENDMETHOD.
+
+  METHOD increaseTimesChildCreated.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+        FIELDS ( TimesChildCreated ) WITH CORRESPONDING #( keys )
+      RESULT DATA(roots).
+
+    MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+      UPDATE
+        FIELDS ( TimesChildCreated ) WITH VALUE #( FOR root IN roots
+                                                    ( %tky                        = root-%tky
+                                                      TimesChildCreated           = root-TimesChildCreated + 1
+                                                      %control-TimesChildCreated  = if_abap_behv=>mk-on ) )
+        FAILED failed
+        REPORTED reported.
+  ENDMETHOD.
+
+  METHOD validateValidTo.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+        FIELDS ( ValidTo ) WITH CORRESPONDING #( keys )
+      RESULT DATA(roots).
+
+    LOOP AT roots ASSIGNING FIELD-SYMBOL(<root>).
+
+      APPEND VALUE #( %tky = <root>-%tky
+                      %state_area = 'VAL_VALID_TO' ) TO reported-root.
+
+      IF <root>-ValidTo < cl_abap_context_info=>get_system_date( ) AND <root>-ValidTo IS NOT INITIAL.
+        APPEND VALUE #( %tky = <root>-%tky ) TO failed-root.
+
+        APPEND VALUE #( %tky        = <root>-%tky
+                        %state_area = 'VAL_VALID_TO'
+                        %msg        = new_message( id       = '/DMO/CM_FSA'
+                                                   number   = 001
+                                                   severity = if_abap_behv_message=>severity-error
+                                                   v1       = |{ <root>-ValidTo DATE = (cl_abap_format=>d_user) }|  )
+                       %element-ValidTo = if_abap_behv=>mk-on ) TO reported-root.
+
+      ENDIF.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+   METHOD validatePercentage.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Child
+        FIELDS ( FieldWithPercent ) WITH CORRESPONDING #( keys )
+        RESULT DATA(children)
+      ENTITY Child BY \_Root
+        FROM CORRESPONDING #( keys )
+      LINK DATA(links).
+
+    LOOP AT children ASSIGNING FIELD-SYMBOL(<child>).
+
+      APPEND VALUE #( %tky = <child>-%tky
+                      %state_area = 'VAL_PERCENTAGE'
+                      ) TO reported-child.
+
+      IF <child>-FieldWithPercent = 0.
+        APPEND VALUE #( %tky = <child>-%tky ) TO failed-child.
+
+        APPEND VALUE #( %tky        = <child>-%tky
+                        %state_area = 'VAL_PERCENTAGE'
+                        %msg        = new_message( id       = '/DMO/CM_FSA'
+                                                   number   = 002
+                                                   severity = if_abap_behv_message=>severity-error )
+                        %path       = VALUE #( root-%tky = links[ KEY ID source-%tky = <child>-%tky ]-target-%tky )
+                        %element-FieldWithPercent = if_abap_behv=>mk-on ) TO reported-child.
+
+      ENDIF.
+
+    ENDLOOP.
   ENDMETHOD.
 
 ENDCLASS.

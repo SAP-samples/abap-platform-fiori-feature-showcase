@@ -1,5 +1,6 @@
 @EndUserText.label: 'Country Collective Value Help'
-
+@ObjectModel.supportedCapabilities:[#COLLECTIVE_VALUE_HELP]
+@ObjectModel.modelingPattern:#COLLECTIVE_VALUE_HELP
 @ObjectModel.collectiveValueHelp.for.element: 'Country'
 
 // Search Term #CollectiveValueHelp

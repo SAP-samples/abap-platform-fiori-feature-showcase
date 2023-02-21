@@ -739,8 +739,14 @@ CLASS lcl_fsa_root IMPLEMENTATION.
       DATA(lv_delete) = get_boolean( ).
       DATA(lv_string_property) = get_string_property( 'Root entity' ) ##NO_TEXT .
 
-      IF lv_delete = abap_true.
-        lv_string_property = lv_string_property && | Delete not possible.| ##NO_TEXT .
+      IF lv_update = abap_true AND lv_delete = abap_true.
+        lv_string_property = lv_string_property && | Delete and update not possible.| ##NO_TEXT .
+      ELSE.
+        IF lv_update = abap_true.
+          lv_string_property = lv_string_property && | Update not possible.| ##NO_TEXT .
+        ELSEIF lv_delete = abap_true.
+          lv_string_property = lv_string_property && | Delete not possible.| ##NO_TEXT .
+        ENDIF.
       ENDIF.
 
       APPEND VALUE /dmo/fsa_root_a(
@@ -767,8 +773,8 @@ CLASS lcl_fsa_root IMPLEMENTATION.
           telephone                 = get_phonenumber( )
           country                   = ls_region-country
           region                    = ls_region-region
-          valid_from                = cl_abap_context_info=>get_system_date( ) - get_int4( min = 0   max = 20 )
-          valid_to                  = cl_abap_context_info=>get_system_date( ) - get_int4( min = 0   max = 20 )
+          valid_from                = cl_abap_context_info=>get_system_date( ) - get_int4( min = 0   max = 120 )
+          valid_to                  = cl_abap_context_info=>get_system_date( ) + get_int4( min = 0   max = 240 )
           time                      = cl_abap_context_info=>get_system_time( ) - get_int4( min = 0   max = 3600 )
           timestamp                 = lv_timestampl
           description               = get_string( 55 )

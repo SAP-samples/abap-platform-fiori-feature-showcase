@@ -44,6 +44,8 @@ CLASS /dmo/fsa_cl_data_generator IMPLEMENTATION.
       COMMIT ENTITIES.
     ENDIF.
 
+    CHECK sy-subrc = 0.
+
     MODIFY ENTITIES OF /DMO/FSA_R_RootTP
       ENTITY Root
         UPDATE

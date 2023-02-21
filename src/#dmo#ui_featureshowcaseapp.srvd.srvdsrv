@@ -1,4 +1,5 @@
 @EndUserText.label: 'Feature Showcase App'
+@ObjectModel.leadingEntity.name: '/DMO/FSA_C_RootTP'
 define service /DMO/UI_FeatureShowcaseApp {
   expose /DMO/FSA_C_RootTP as Root;
   expose /DMO/FSA_C_ChildTP as Child;
@@ -11,4 +12,5 @@ define service /DMO/UI_FeatureShowcaseApp {
   expose I_UnitOfMeasure as UnitOfMeasure;
   expose I_Currency as Currency;
   expose I_Region as Region;
+  expose I_Language as Language;
 }

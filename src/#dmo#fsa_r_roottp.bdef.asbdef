@@ -23,17 +23,35 @@ etag master LocalLastChangedAt
   field ( readonly, numbering : managed ) ID;
   field ( mandatory ) Email;
   field ( mandatory : create, readonly : update ) StringProperty;
+  field ( features : instance ) TimesChildCreated, TotalPieces;
 
-  action changeProgress parameter /DMO/FSA_D_ChangeProgressP result [1] $self;
-  action changeCriticality parameter /DMO/FSA_D_ChangeCriticalityP result [1] $self;
+  internal action calcTotalPieces;
+
+  action increaseTimesChildCreated;
+  action ( features : instance ) changeProgress parameter /DMO/FSA_D_ChangeProgressP result [1] $self;
+  action ( features : instance ) changeCriticality parameter /DMO/FSA_D_ChangeCriticalityP result [1] $self;
+  action ( features : instance ) resetTimesChildCreated;
 
   determination generateOtherData on save { create; }
-  determination setIntegerValue on modify { field ProgressIntegerValue; }
+  determination setIntegerValue on modify { field IntegerValue; }
+
+  validation validateValidTo on save   { create; update; field ValidTo; }
+
+  determine action validateDate { validation validateValidTo; }
+  determine action validateChild { validation Child ~ validatePercentage; }
 
   association _Chart { create; with draft; }
   association _Child { create; with draft; }
 
-  mapping for /dmo/fsa_root_a {
+  side effects {
+    field IntegerValue affects field ProgressIntegerValue, field RadialIntegerValue;
+    field NavigationID affects entity _Navigation;
+    action resetTimesChildCreated affects field TimesChildCreated, permissions ( action resetTimesChildCreated );
+    determine action validateDate executed on field ValidTo affects messages;
+    determine action validateChild executed on entity _Child affects messages;
+  }
+
+  mapping for /dmo/fsa_root_a corresponding {
     ContactID = contact_id;
     CreatedAt = created_at;
     CreatedBy = created_by;
@@ -56,9 +74,43 @@ etag master LocalLastChangedAt
     StarsValue = stars_value;
     StringProperty = string_property;
     TargetValue = target_value;
+    TimesChildCreated = times_child_created;
+    TotalPieces = total_pieces;
     UpdateHidden = update_hidden;
     ValidFrom = valid_from;
     ValidTo = valid_to;
+    TypeAccp = type_accp;
+    TypeBool = type_bool;
+    TypeChar = type_char;
+    TypeClnt = type_clnt;
+    TypeCuky = type_cuky;
+    TypeCurr = type_curr;
+    TypeDecAmount = type_dec_amount;
+    TypeDatn = type_datn;
+    TypeDats = type_dats;
+    TypeDec = type_dec;
+    TypeDf16Dec = type_df16_dec;
+    TypeDf34Dec = type_df34_dec;
+    TypeFltp = type_fltp;
+    TypeInt1 = type_int1;
+    TypeInt2 = type_int2;
+    TypeInt4 = type_int4;
+    TypeInt8 = type_int8;
+    TypeNumc = type_numc;
+    TypeQuan = type_quan;
+    TypeFltpQuan = type_fltp_quan;
+    TypeRawstring = type_rawstring;
+    TypeSstring = type_sstring;
+    TypeString = type_string;
+    TypeTimn = type_timn;
+    TypeTims = type_tims;
+    TypeUtclong = type_utclong;
+    TypeTzntstmps = type_tzntstmps;
+    TypeTzntstmpl = type_tzntstmpl;
+    TypeDecTime = type_dec_time;
+    StreamMimeType = stream_mimetype;
+    TypeLang = type_lang;
+    TypeUnit = type_unit;
   }
 }
 
@@ -67,7 +119,6 @@ persistent table /dmo/fsa_chart_a
 draft table /dmo/fsa_chart_d
 lock dependent by _Root
 authorization dependent by _Root
-//etag master <field_name>
 {
   update;
   delete;
@@ -79,7 +130,7 @@ authorization dependent by _Root
 
   association _Root { with draft; }
 
-  mapping for /dmo/fsa_chart_a {
+  mapping for /dmo/fsa_chart_a corresponding{
     AreachartDevLowerboundValue = areachart_dev_lowerbound_value;
     AreachartDevUpperboundValue = areachart_dev_upperbound_value;
     AreachartTolLowerboundValue = areachart_tol_lowerbound_value;
@@ -98,19 +149,25 @@ persistent table /dmo/fsa_child_a
 draft table /dmo/fsa_child_d
 lock dependent by _Root
 authorization dependent by _Root
-//etag master <field_name>
 {
   update;
-  delete;
+  delete ( features : instance );
 
   field ( readonly ) ParentId;
   field ( readonly, numbering : managed ) ID;
   field ( readonly : update, mandatory : create ) StringProperty;
 
+  determination calculateTotalPieces on modify { field ChildPieces; }
+  validation validatePercentage on save { create; update;  }
+
+  side effects {
+    field ChildPieces affects field _Root.TotalPieces;
+  }
+
   association _Root { with draft; }
   association _Grandchild { create; with draft; }
 
-  mapping for /dmo/fsa_child_a {
+  mapping for /dmo/fsa_child_a corresponding{
     BooleanProperty = boolean_property;
     CriticalityCode = criticality_code;
     FieldWithPercent = field_with_percent;
@@ -119,6 +176,7 @@ authorization dependent by _Root
     StreamFile = stream_file;
     StreamFilename = stream_filename;
     StreamMimeType = stream_mimetype;
+    ChildPieces = child_pieces;
   }
 }
 
@@ -127,7 +185,6 @@ persistent table /dmo/fsa_gch_a
 draft table /dmo/fsa_gch_d
 lock dependent by _Root
 authorization dependent by _Root
-//etag master <field_name>
 {
   update;
   delete;
@@ -138,7 +195,7 @@ authorization dependent by _Root
   association _Root { with draft; }
   association _Child { with draft; }
 
-  mapping for /dmo/fsa_gch_a {
+  mapping for /dmo/fsa_gch_a corresponding{
     ParentID = parent_id;
     RootID = root_id;
     StringProperty = string_property;

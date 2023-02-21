@@ -11,10 +11,13 @@ define view entity /DMO/FSA_R_ChildTP
       StringProperty,
       FieldWithPercent,
       BooleanProperty,
+      
+      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_I_Criticality', element: 'Code' }  }]
       CriticalityCode,
       StreamFile,
       StreamFilename,
       StreamMimeType,
+      ChildPieces,
       /* Associations */
       _Criticality,
       _Grandchild,

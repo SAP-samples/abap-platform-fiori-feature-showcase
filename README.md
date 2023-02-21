@@ -1,6 +1,6 @@
 [![REUSE status](https://api.reuse.software/badge/github.com/sap-samples/abap-platform-fiori-feature-showcase)](https://api.reuse.software/info/github.com/sap-samples/abap-platform-fiori-feature-showcase)
 
-# Fiori Element Feature Showcase App for the ABAP RESTful Application Programming Model
+# SAP Fiori Element Feature Showcase App for the ABAP RESTful Application Programming Model
 ![App List Report](/../main/Images/app-list.jpg)
 ![App Object Page](/../main/Images/app-objectpage.jpg)
 
@@ -28,6 +28,10 @@ Make sure to fulfill the following requirements:
 * You have downloaded and installed ABAP Development Tools (ADT). Make sure to use the most recent version as indicated on the [installation page](https://tools.hana.ondemand.com/#abap). 
 * You have created an ABAP Cloud Project in ADT that allows you to access your SAP BTP ABAP Environment instance (see [here](https://help.sap.com/viewer/5371047f1273405bb46725a417f95433/Cloud/en-US/99cc54393e4c4e77a5b7f05567d4d14c.html) for additional information). Your log-on language is English.
 * You have installed the [abapGit](https://github.com/abapGit/eclipse.abapgit.org) plug-in for ADT from the update site `http://eclipse.abapgit.org/updatesite/`.
+
+| :green_circle: If you have already downloaded the Feature Showcase App before, it is advisable to regenerate new data once you have pulled the new release into your system and activated the objects |
+| -------- |
+
 
 ## Download
 Use the abapGit plug-in to install the <em>Feature Showcase App</em> by executing the following steps:
@@ -67,4 +71,4 @@ NOTE: The namespace /DMO/ is reserved for the demo content. Apart from the downl
 This project is provided "as-is": there is no guarantee that raised issues will be answered or addressed in future releases.
 
 ## License
-Copyright (c) 2022 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](LICENSE) file.
+Copyright (c) 2022- 2023 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](/../main/LICENSES/Apache-2.0.txt) file.

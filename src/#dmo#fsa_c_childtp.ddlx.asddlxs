@@ -14,7 +14,7 @@
   presentationVariant: [
     { 
       qualifier: 'pVariant',
-      maxItems: 7,
+      maxItems: 5,
       sortOrder: [
         {
           by: 'StringProperty',
@@ -49,15 +49,35 @@ annotate entity /DMO/FSA_C_ChildTP
     { 
       purpose: #HEADER,
       type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'StringProperty'
+    },
+    { 
+      purpose: #STANDARD,
+      type: #COLLECTION,
+      id: 'Collection',
+      label: 'Data'
+    },
+    { 
+      purpose: #STANDARD,
+      type: #DATAPOINT_REFERENCE,
       targetQualifier: 'FieldWithPercent',
-      id: 'FacetWithPercent'
+      label: 'Percentage',
+      parentId: 'Collection'
+    },
+    { 
+      purpose: #STANDARD,
+      type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'CriticalityCode',
+      label: 'Criticality',
+      parentId: 'Collection'
     },
     // Search Term #Stream
     {
-      purpose: #HEADER,
+      purpose: #STANDARD,
       type: #FIELDGROUP_REFERENCE,
       targetQualifier: 'Stream',
-      label: 'Large Object (#Stream)'
+      label: 'Large Object (#Stream)',
+      parentId: 'Collection'
     },
     // Search Term #OPTable
     {
@@ -74,24 +94,56 @@ annotate entity /DMO/FSA_C_ChildTP
   @UI.hidden: true
   ParentID;
   
-  @UI.lineItem: [{ position: 10 }] // Search Term #OPTable
+  @UI: { 
+    // Search Term #OPTable
+    lineItem: [
+      { 
+        position: 10,
+        criticality: 'CriticalityCode'
+      },
+      // Search Term #ActionOverload
+      { 
+        type: #FOR_ACTION, 
+        dataAction: '/DMO/FSA_C_RootTP.createChildFromRoot', 
+        label: 'Create Child from Root (#ActionOverload)'
+      }
+    ], 
+    dataPoint: { 
+      criticality: 'CriticalityCode',
+      criticalityRepresentation: #WITHOUT_ICON,
+      title: 'String Property' 
+    }
+  }
   StringProperty;
   
   @UI: { 
-    lineItem: [{ position: 20 }], // Search Term #OPTable
+    lineItem: [
+      { 
+        position: 20,
+        label: 'Percentage (0.00 to trigger Validation)' 
+      }
+    ], // Search Term #OPTable
     dataPoint: { 
       title: 'Percentage property',
       visualization: #NUMBER
     }
-  }
+  } 
+  @EndUserText.quickInfo: 'Change value to trigger validation - side effect'
   FieldWithPercent;
-  
+
+  @UI: { 
+    dataPoint: { 
+      title: 'Criticality',
+      criticality: 'CriticalityCode'
+    }
+  } 
+  CriticalityCode;
+
   @UI: {
     // Search Term #OPTable
     lineItem: [
       { 
-        position: 30,
-        criticality: 'CriticalityCode' 
+        position: 30
       }
     ],
     defaultValue: 'X'
@@ -103,7 +155,7 @@ annotate entity /DMO/FSA_C_ChildTP
   StreamMimeType;
   
   @UI: {
-    lineItem: [{ position: 40, label: 'Attachment (#StreamTable)' }], // Search Term #StreamTable
+    lineItem: [{ position: 50, label: 'Attachment (#StreamTable)' }], // Search Term #StreamTable
     fieldGroup: [{ position: 10, qualifier: 'Stream', label: 'Attachment (#Stream)' }] // Search Term #Stream
   }
   StreamFile;
@@ -111,4 +163,10 @@ annotate entity /DMO/FSA_C_ChildTP
   // Search Term #Stream
   @UI.hidden: true
   StreamFilename;
+  
+  @UI: {
+    lineItem: [{ position: 40, label: 'Child Pieces (#SideEffects)' }] // Search Term #SideEffects
+  }
+  @EndUserText.quickInfo: 'Change value to trigger Total recalculation at Root - side effect'
+  ChildPieces;
 }

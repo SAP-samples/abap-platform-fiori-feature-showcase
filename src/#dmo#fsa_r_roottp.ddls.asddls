@@ -78,11 +78,51 @@ define root view entity /DMO/FSA_R_RootTP
       Timestamp,
       Description,
       DescriptionCustomGrowing,
+      TimesChildCreated,
+      TotalPieces,
       CreatedBy,
       CreatedAt,
       LocalLastChangedBy,
       LocalLastChangedAt,
       LastChangedAt,
+      TypeAccp,
+      TypeBool,
+      TypeChar,
+      TypeClnt,
+      TypeCurr,
+      TypeDecAmount,
+      TypeDatn,
+      TypeDats,
+      TypeDec,
+      TypeDf16Dec,
+      TypeDf34Dec,
+      TypeFltp,
+      TypeInt1,
+      TypeInt2,
+      TypeInt4,
+      TypeInt8,
+      TypeNumc,
+      TypeQuan,
+      TypeFltpQuan,
+      TypeRawstring,
+      TypeSstring,
+      TypeString,
+      TypeTimn,
+      TypeTims,
+      TypeUtclong,
+      TypeTzntstmps,
+      TypeTzntstmpl,
+      TypeDecTime,
+      StreamMimeType,
+      
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_CurrencyStdVH', element: 'Currency' } }]
+      TypeCuky,
+      
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_Language', element: 'Language' } }]
+      TypeLang,
+      
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_UnitOfMeasureStdVH', element: 'UnitOfMeasure' } }]
+      TypeUnit,
       /* Associations */
       _Contact,
       _Country,
@@ -92,5 +132,6 @@ define root view entity /DMO/FSA_R_RootTP
       _Region,
       _UoM,
       _Child,
-      _Chart
+      _Chart,
+      _Language
 }
