@@ -55,8 +55,14 @@ annotate entity /DMO/FSA_C_ChildTP
       purpose: #STANDARD,
       type: #COLLECTION,
       id: 'Collection',
-      label: 'Data'
+      label: 'Child Data'
     },
+//    { 
+//      purpose: #STANDARD,
+//      type: #FIELDGROUP_REFERENCE,
+//      targetQualifier: 'RootData',
+//      label: 'Root Data'
+//    },
     { 
       purpose: #STANDARD,
       type: #DATAPOINT_REFERENCE,
@@ -143,11 +149,13 @@ annotate entity /DMO/FSA_C_ChildTP
     // Search Term #OPTable
     lineItem: [
       { 
+        label: 'Toggle Delete (#SideEffects)',
         position: 30
       }
     ],
     defaultValue: 'X'
   }
+  @EndUserText.quickInfo: 'Check/Uncheck to enable/disable Delete button - side effect'
   BooleanProperty;
   
   // Search Term #Stream
@@ -169,4 +177,8 @@ annotate entity /DMO/FSA_C_ChildTP
   }
   @EndUserText.quickInfo: 'Change value to trigger Total recalculation at Root - side effect'
   ChildPieces;
+  
+//  // Search Term #SideEffects ( target path more than one association )
+//  @UI.fieldGroup: [{ qualifier: 'RootData' }]
+//  TotalGrandchildPieces;
 }

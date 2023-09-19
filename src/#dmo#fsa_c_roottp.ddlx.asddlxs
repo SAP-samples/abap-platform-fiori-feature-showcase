@@ -32,7 +32,7 @@
     ],
     visualizations: [{type: #AS_LINEITEM}]
   }
-]
+] 
 
 // Search Term #SelectionVariant
 @UI.selectionVariant: [
@@ -265,10 +265,29 @@ annotate entity /DMO/FSA_C_RootTP with
     },
     // Search Term #TimeAndDate
     {
-      parentId   : 'collectionFacetSection',
+      parentId   : 'Nested',
+      id         : 'TimeAndDate',
       label      : 'Time and Date (#TimeAndDate)',
+      type       : #COLLECTION
+    },
+    {
+      parentId   : 'TimeAndDate',
       type       : #FIELDGROUP_REFERENCE,
-      targetQualifier: 'timeAndDate'
+      targetQualifier: 'TimeDate',
+      label      : 'Time and Date'
+    },
+    // Search Term #IANATimezone
+    {
+      parentId   : 'TimeAndDate',
+      type       : #FIELDGROUP_REFERENCE,
+      targetQualifier: 'TimezoneInput',
+      label      : 'SAP Timezone'
+    },
+    {
+      parentId   : 'TimeAndDate',
+      type       : #FIELDGROUP_REFERENCE,
+      targetQualifier: 'TimezoneOutput',
+      label      : 'IANA Timezone'
     },
     // Search Term #MicroChartDataSection
     {
@@ -309,6 +328,13 @@ annotate entity /DMO/FSA_C_RootTP with
       label: 'Child Entity (1..n)(#OPTable)',
       id: 'childEntitiesSection'
     },
+//    // Test subitem lineitem facet
+//    {
+//      purpose: #STANDARD,
+//      type: #LINEITEM_REFERENCE,
+//      targetElement: '_Child._Grandchild',
+//      label: 'Grandchild'
+//    },
     // Search Term #SideEffectsSection
     {
       purpose: #STANDARD,
@@ -354,15 +380,28 @@ annotate entity /DMO/FSA_C_RootTP with
       label: 'Location (#FilterGrouping)'
     }
   ]
-
-  // Search Term #OPHeaderAction
+  
   @UI.identification: [
+    // Search Term #OPHeaderAction
     {
       type: #FOR_ACTION,  //Action in the RootEntities of the object page next to the edit button
       label: 'Change Criticality (#OPHeaderAction)',
       criticality: 'CriticalityCode',
-      criticalityRepresentation: #WITH_ICON,
       dataAction: 'changeCriticality'
+    },
+    // Search Term #OPDetermineAction
+    {
+      type: #FOR_ACTION,
+      label: 'Change Criticality (#OPDetermineAction)',
+      criticality: 'CriticalityCode',
+      dataAction: 'changeCriticality',
+      determining: true
+    },
+    // Search Term #OPCopyAction
+    {
+      type:#FOR_ACTION,
+      dataAction: 'copyInstance',
+      isCopyAction: true
     }
   ]
 
@@ -547,8 +586,18 @@ annotate entity /DMO/FSA_C_RootTP with
         qualifier: 'HeaderData',
         type: #AS_CONTACT,
         label: 'Contact QuickView (#ContactInHeader)',
-        position: 50,
+        position: 70,
         value: '_Contact'
+      },
+      // Search Term #UISemanticObject
+      { 
+        qualifier: 'HeaderData',
+        position: 40,
+        label: 'IntentBased Navi (#UISemanticObject)',
+        type: #WITH_INTENT_BASED_NAVIGATION,
+        semanticObject: 'FeatureShowcaseContact',
+        semanticObjectAction: 'manage',
+        semanticObjectBinding: [{ localElement: 'Country', element: 'Country' }]
       }
     ],
     // Search Term #ContactInLineItem
@@ -572,6 +621,13 @@ annotate entity /DMO/FSA_C_RootTP with
       {
         qualifier: 'ShowWhenInEdit',
         label: 'Criticality'
+      },
+      // Search Term #QuickViewNullValueIndicator
+      {
+        qualifier: 'HeaderData',
+        criticality: 'CriticalityCode',
+        position: 50,
+        label: 'Criticality QuickView(#QuickViewNullValueIndicator)'
       }
     ]
   }
@@ -579,8 +635,8 @@ annotate entity /DMO/FSA_C_RootTP with
   //  @Consumption.filter.defaultValue: '3' // Search term #FilterDefault
   CriticalityCode;
 
-  @UI.hidden: true
-  Uom;
+//  @UI.hidden: true
+//  Uom;
 
   @UI: {
     lineItem: [
@@ -594,7 +650,7 @@ annotate entity /DMO/FSA_C_RootTP with
       // Search Term #HeaderFieldGroup
       {
         qualifier: 'HeaderData',
-        position: 30
+        position: 20
       }
     ]
   }
@@ -634,30 +690,36 @@ annotate entity /DMO/FSA_C_RootTP with
   //Search-Term: #HarveyMicroChart
   @UI.dataPoint: {
     qualifier: 'HarveyFieldWithPrice',
-  //    maximumValue: #(FieldWithQuantity),
-    maximumValue: 5000.00,
+    maximumValue: 5560.00,
     criticality: 'CriticalityCode',
     valueFormat.numberOfFractionalDigits: 2
   }
   HarveyFieldWithPrice;
-
 
   @UI: {
     lineItem: [
       {
         position: 50,
         criticality: 'CriticalityCode',
-        criticalityRepresentation: #WITH_ICON,
+        label: 'Change Criticality (#WithActionInLineItem)',
+        type: #WITH_ACTION,
+        dataAction: 'changeCriticality',
         importance: #LOW
       }
     ],
     fieldGroup: [
-      { qualifier: 'ShowWhenInEdit' }, // Search Term #HidingContent
-      // Search Term #HeaderFieldGroup
+      // Search Term #HidingContent
+      { 
+        qualifier: 'ShowWhenInEdit'
+      }, 
+      // Search Term #HeaderFieldGroup, #WithActionInOP
       {
         qualifier: 'HeaderData',
         criticality: 'CriticalityCode',
-        position: 20
+        position: 30,
+        label: 'Change Criticality (#WithActionInOP)',
+        dataAction: 'changeCriticality',
+        type: #WITH_ACTION
       }
     ]
   }
@@ -709,7 +771,8 @@ annotate entity /DMO/FSA_C_RootTP with
   @UI.fieldGroup: [
     // Search Term #TimeAndDate
     { 
-      qualifier: 'timeAndDate' 
+      qualifier: 'TimeDate', 
+      position: 20
     },
     // Search Term #SideEffects
     { 
@@ -719,12 +782,54 @@ annotate entity /DMO/FSA_C_RootTP with
   ]
   ValidTo;
 
-  @UI.fieldGroup: [{ qualifier: 'timeAndDate' }] // Search Term #TimeAndDate
+  // Search Term #TimeAndDate
+  @UI.fieldGroup: [{ 
+    qualifier: 'TimeDate', 
+    position: 10
+  }]
   Time;
+  
+  // Search Term #IANATimezone
+  @UI.fieldGroup: [
+    { 
+      qualifier: 'TimezoneInput', 
+      position: 10, 
+      label: 'SAP Timezone' 
+    }
+    ,
+    {
+      qualifier: 'TimezoneInput',
+      dataAction: 'overwriteTimezone',
+      type: #FOR_ACTION,
+      emphasized: true,
+      label: 'Overwrite Timezone (#IANATimezoneAParameter)'
+    }
+  ]
+  SAPTimezone;
+  
+  @UI.fieldGroup: [{ 
+    qualifier: 'TimezoneOutput', 
+    position: 10, 
+    label: 'IANA Timezone (#IANATimezone)' 
+  }]
+  IANATimezone;
 
-  @UI.fieldGroup: [{ qualifier: 'timeAndDate' }] // Search Term #TimeAndDate
+  @UI.fieldGroup: [{ 
+    qualifier: 'TimezoneInput', 
+    position: 20
+  }]
+  @UI.lineItem: [{ position: 210 }]
   Timestamp;
-
+  
+  @UI.fieldGroup: [{ 
+    qualifier: 'TimezoneOutput', 
+    position: 20,
+    label: 'IANA Timestamp (#IANATimezone)' 
+  }]
+  @UI.lineItem: [{ position: 210 }]
+  IANATimestamp;
+  // End Search Term #IANATimezone
+  
   @UI: {
     fieldGroup: [
       // Search Term #PlainText
@@ -756,11 +861,11 @@ annotate entity /DMO/FSA_C_RootTP with
   @Consumption.semanticObject: 'FeatureShowcaseNavigation'
   @UI: {
     fieldGroup: [
-      // Search Term #HeaderFieldGroup, #QuickView
+      // Search Term #HeaderFieldGroup, #OPQuickView
       {
         qualifier: 'HeaderData',
-        position: 40,
-        label: 'Navigation (#QuickView)'
+        position: 50,
+        label: 'Navigation QuickView (#OPQuickView)'
       },
       // Search Term #SectionNavigation ( Button )
       {
@@ -774,7 +879,6 @@ annotate entity /DMO/FSA_C_RootTP with
         qualifier: 'OPForm',
         label: 'IntentBased Navi (#FormNavigation)',
         type: #WITH_INTENT_BASED_NAVIGATION,
-        value: 'NavigationID',
         semanticObjectAction: 'manage',
         position: 50
       },
@@ -786,13 +890,12 @@ annotate entity /DMO/FSA_C_RootTP with
       }
     ],
     lineItem: [
-      // Search Tern #QuickView
+      // Search Tern #QuickViewTable
       {
-        label: 'Navigation (#QuickView)',
+        label: 'Navigation (#QuickViewTable)',
         importance: #HIGH,
         position: 90
-      }
-      ,
+      },
       // Search Tern #Navigation-IBN
       {
         label: 'IntentBased Navigation (#NavAction-IBN)',
@@ -841,7 +944,7 @@ annotate entity /DMO/FSA_C_RootTP with
         label: 'Admin Data (#MultiFieldsCol)',
         valueQualifier: 'AdminData',
         importance: #HIGH,
-        position: 100
+        position: 140
       }
     ]
   }
@@ -855,6 +958,22 @@ annotate entity /DMO/FSA_C_RootTP with
         label: 'Change Criticality (#ActionInLineItem)',
         dataAction: 'changeCriticality',
         position: 10
+      },
+      // Search Term #InlineActionInLineItem
+      {
+        type:#FOR_ACTION,
+        label: 'Change Progress(#InlineActionInLineItem)',
+        dataAction: 'changeProgress',
+        inline: true,
+        emphasized: true,
+        importance: #HIGH,
+        position: 100
+      },
+      // Search Term #CopyActionInLineItem
+      {
+        type:#FOR_ACTION,
+        dataAction: 'copyInstance',
+        isCopyAction: true
       }
     ],
     fieldGroup: [
@@ -865,6 +984,15 @@ annotate entity /DMO/FSA_C_RootTP with
         type: #FOR_ACTION,
         emphasized: true,
         label: 'Change Progress (#ActionInSection)'
+      },
+      // Search Term #InlineActionInForm
+      {
+        qualifier: 'OPForm',
+        dataAction: 'changeCriticality',
+        type: #FOR_ACTION,
+        emphasized: true,
+        inline: true,
+        label: 'Change Criticality (#InlineActionInForm)'
       },
       // Search Term #SideEffectsAction
       {

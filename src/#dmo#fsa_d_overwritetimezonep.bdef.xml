@@ -3,39 +3,39 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <BDEF>
-    <NAME>/DMO/FSA_C_ROOTTP</NAME>
+    <NAME>/DMO/FSA_D_OVERWRITETIMEZONEP</NAME>
     <TYPE>BDEF/BDO</TYPE>
-    <DESCRIPTION>Root TP</DESCRIPTION>
+    <DESCRIPTION>Overwrite Timezone Parameter</DESCRIPTION>
     <DESCRIPTION_TEXT_LIMIT>60</DESCRIPTION_TEXT_LIMIT>
     <LANGUAGE>EN</LANGUAGE>
     <LINKS>
      <item>
-      <HREF>./%2Fdmo%2Ffsa_c_roottp/source/main/versions</HREF>
+      <HREF>./%2Fdmo%2Ffsa_d_overwritetimezonep/source/main/versions</HREF>
       <REL>http://www.sap.com/adt/relations/versions</REL>
       <TITLE>Historic versions</TITLE>
      </item>
      <item>
-      <HREF>/sap/bc/adt/repository/informationsystem/abaplanguageversions?uri=%2Fsap%2Fbc%2Fadt%2Fbo%2Fbehaviordefinitions%2F%252fdmo%252ffsa_c_roottp</HREF>
+      <HREF>/sap/bc/adt/repository/informationsystem/abaplanguageversions?uri=%2Fsap%2Fbc%2Fadt%2Fbo%2Fbehaviordefinitions%2F%252fdmo%252ffsa_d_overwritetimezonep</HREF>
       <REL>http://www.sap.com/adt/relations/informationsystem/abaplanguageversions</REL>
       <TYPE>application/vnd.sap.adt.nameditems.v1+xml</TYPE>
       <TITLE>Allowed ABAP language versions</TITLE>
      </item>
      <item>
-      <HREF>./%2Fdmo%2Ffsa_c_roottp/source/main</HREF>
+      <HREF>./%2Fdmo%2Ffsa_d_overwritetimezonep/source/main</HREF>
       <REL>http://www.sap.com/adt/relations/source</REL>
       <TYPE>text/plain</TYPE>
       <TITLE>Source Content</TITLE>
      </item>
      <item>
-      <HREF>./%2Fdmo%2Ffsa_c_roottp/source/main</HREF>
+      <HREF>./%2Fdmo%2Ffsa_d_overwritetimezonep/source/main</HREF>
       <REL>http://www.sap.com/adt/relations/source</REL>
       <TYPE>text/html</TYPE>
       <TITLE>Source Content (HTML)</TITLE>
      </item>
     </LINKS>
     <MASTER_LANGUAGE>EN</MASTER_LANGUAGE>
-    <ABAP_LANGU_VERSION>5</ABAP_LANGU_VERSION>
-    <SOURCE_URI>./%2Fdmo%2Ffsa_c_roottp/source/main</SOURCE_URI>
+    <ABAP_LANGU_VERSION>X</ABAP_LANGU_VERSION>
+    <SOURCE_URI>./%2Fdmo%2Ffsa_d_overwritetimezonep/source/main</SOURCE_URI>
     <SOURCE_TYPE>ABAP_SOURCE</SOURCE_TYPE>
     <SOURCE_FIXED_POINT_ARITHMETIC>true</SOURCE_FIXED_POINT_ARITHMETIC>
     <SOURCE_UNICODE_CHECKS_ACTIVE>true</SOURCE_UNICODE_CHECKS_ACTIVE>

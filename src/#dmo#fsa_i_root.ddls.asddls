@@ -46,7 +46,7 @@ define view entity /DMO/FSA_I_Root
       criticality_code          as CriticalityCode,
 
       @EndUserText.label : 'Property with Criticality'
-      field_with_criticality    as FieldWithCriticality,
+      field_with_criticality    as FieldWithCriticality, 
 
       @ObjectModel.foreignKey.association: '_UoM'
       @EndUserText.label : 'Unit of Measure (#Units)'
@@ -65,7 +65,16 @@ define view entity /DMO/FSA_I_Root
       @Semantics.amount.currencyCode: 'IsoCurrency'
       @EndUserText.label : 'Property with Currency (#Units)'
       field_with_price          as FieldWithPrice,
+      
+      @EndUserText.label : 'Intent Based Navigation'
+      @EndUserText.quickInfo: 'QuickView'
+      @ObjectModel.foreignKey.association: '_Navigation'
+      navigation_id             as NavigationID, 
 
+      // Search Term #QuickViewNullValueIndicator
+      @Semantics.nullValueIndicatorFor: 'CriticalityCode'
+      cast(' ' as abap_boolean preserving type ) as CriticalityNullValInd,
+      
       delete_hidden             as DeleteHidden,
       update_hidden             as UpdateHidden,
       field_with_url            as FieldWithUrl,
@@ -89,10 +98,10 @@ define view entity /DMO/FSA_I_Root
       @EndUserText.label : 'Region'
       region                    as Region,
 
-      @EndUserText.label : 'Date'
+      @EndUserText.label : 'Valid From Date'
       valid_from                as ValidFrom,
 
-      @EndUserText.label : 'To Date'
+      @EndUserText.label : 'Valid To Date'
       valid_to                  as ValidTo,
 
       @EndUserText.label : 'Time'
@@ -100,6 +109,9 @@ define view entity /DMO/FSA_I_Root
 
       @EndUserText.label : 'Timestamp'
       timestamp                 as Timestamp,
+      
+      @EndUserText.label : 'Timezone'
+      time_zone                 as SAPTimezone,
 
       @EndUserText.label : 'Description'
       description               as Description,
@@ -107,16 +119,14 @@ define view entity /DMO/FSA_I_Root
       @EndUserText.label : 'Second Description'
       description_customgrowing as DescriptionCustomGrowing,
 
-      @EndUserText.label : 'Intent Based Navigation'
-      @EndUserText.quickInfo: 'QuickView'
-      @ObjectModel.foreignKey.association: '_Navigation'
-      navigation_id             as NavigationID,
-      
       @EndUserText.label : 'Children Created via Root Action'
       times_child_created       as TimesChildCreated,
 
       @EndUserText.label : 'Total Pieces'
       total_pieces              as TotalPieces,
+      
+      @EndUserText.label : 'Total Grandchild Pieces'
+      total_granddchild_pieces  as TotalGrandchildPieces,
       
       @Semantics.user.createdBy: true
       created_by                as CreatedBy,

@@ -2,7 +2,7 @@
 @EndUserText.label: 'Root TP'
 @Metadata.allowExtensions: true
 
-@Search.searchable: true
+@Search.searchable: true 
 @ObjectModel.semanticKey: ['StringProperty']
 
 define root view entity /DMO/FSA_C_RootTP
@@ -35,6 +35,7 @@ define root view entity /DMO/FSA_C_RootTP
       NavigationID,
       FieldWithCriticality,
       HarveyFieldWithPrice,
+      CriticalityNullValInd,
       DeleteHidden,
       UpdateHidden,
       FieldWithUrl,
@@ -45,10 +46,14 @@ define root view entity /DMO/FSA_C_RootTP
       ValidTo,
       Time,
       Timestamp,
+      IANATimestamp,
+      SAPTimezone,
+      IANATimezone,
       Description,
       DescriptionCustomGrowing,
       TimesChildCreated,
       TotalPieces,
+      TotalGrandchildPieces,
       CreatedBy,
       CreatedAt,
       LocalLastChangedBy,

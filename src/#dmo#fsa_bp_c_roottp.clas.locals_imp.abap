@@ -36,14 +36,14 @@ CLASS lhc_Root IMPLEMENTATION.
         REPORTED DATA(upd_reported).
 
     result = VALUE #( FOR root IN roots
-                        ( %tky   = root-%tky
-                          %param = CORRESPONDING #( upd_mapped-child[ 1 ] ) ) ).
+                        ( %tky    = CORRESPONDING #( root-%tky )
+                          %param  = CORRESPONDING #( upd_mapped-child[ 1 ] ) ) ).
 
     LOOP AT roots ASSIGNING FIELD-SYMBOL(<root>).
-      APPEND VALUE #( %tky        = <root>-%tky
-                      %msg        = new_message( id       = '/DMO/CM_FSA'
-                                                 number   = 004
-                                                 severity = if_abap_behv_message=>severity-success ) ) TO reported-root.
+      APPEND VALUE #( %tky  = CORRESPONDING #( <root>-%tky )
+                      %msg  = new_message( id       = '/DMO/CM_FSA'
+                                           number   = 004
+                                           severity = if_abap_behv_message=>severity-success ) ) TO reported-root.
     ENDLOOP.
   ENDMETHOD.
 
@@ -59,7 +59,7 @@ CLASS lhc_Root IMPLEMENTATION.
           LET is_updatable =  COND #( WHEN root-UpdateHidden  = abap_true
                                         THEN if_abap_behv=>fc-o-disabled
                                         ELSE if_abap_behv=>fc-o-enabled  )
-          IN ( %tky                       = root-%tky
+          IN ( %tky                         = CORRESPONDING #( root-%tky )
                %action-createChildFromRoot  = is_updatable )
       ).
   ENDMETHOD.

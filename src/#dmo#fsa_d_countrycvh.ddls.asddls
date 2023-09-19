@@ -10,14 +10,14 @@ define abstract entity /DMO/FSA_D_CountryCVH
     // 'Default' VH
     { 
       entity: { name:'I_Country' },
-      label: 'Search by Country' 
+      label: 'Search by Country'
     },
     // additional VH, set qualifier
     { 
       entity: { name:'/DMO/FSA_I_ContactVH',
                 element:'Country' },
       label: 'Search by Contact',
-      qualifier: 'ContactSearch' 
+      qualifier: 'ContactSearch'
     },
     // additional VH, set qualifier
     { 
@@ -26,7 +26,7 @@ define abstract entity /DMO/FSA_D_CountryCVH
       additionalBinding: [{ localElement:'Region',
                             element:'Region'  }],
       label: 'Search by Region',
-      qualifier:  'RegionSearch' 
+      qualifier:  'RegionSearch'
     }
   ]
   Country : land1;

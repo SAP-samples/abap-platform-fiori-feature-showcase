@@ -11,31 +11,36 @@ authorization master ( instance )
 etag master LocalLastChangedAt
 {
   create;
-  update;
+  update (features : instance);
   delete (features : instance);
 
-  draft determine action Prepare;
+  draft determine action Prepare { validation validateTimezone; }
   draft action Edit;
-  draft action Activate;
+  draft action Activate optimized;
   draft action Discard;
   draft action Resume;
 
   field ( readonly, numbering : managed ) ID;
   field ( mandatory ) Email;
   field ( mandatory : create, readonly : update ) StringProperty;
-  field ( features : instance ) TimesChildCreated, TotalPieces;
+  field ( features : instance ) TimesChildCreated;
+  field ( readonly ) IANATimestamp,  IANATimezone, TotalPieces;
 
   internal action calcTotalPieces;
 
   action increaseTimesChildCreated;
+  action ( features : instance ) overwriteTimezone deep parameter /DMO/FSA_D_OverwriteTimezoneP;
+  factory action (features : instance) copyInstance [1];
   action ( features : instance ) changeProgress parameter /DMO/FSA_D_ChangeProgressP result [1] $self;
   action ( features : instance ) changeCriticality parameter /DMO/FSA_D_ChangeCriticalityP result [1] $self;
   action ( features : instance ) resetTimesChildCreated;
 
   determination generateOtherData on save { create; }
   determination setIntegerValue on modify { field IntegerValue; }
+  determination setTime on modify { field SAPTimezone, Timestamp; }
 
   validation validateValidTo on save   { create; update; field ValidTo; }
+  validation validateTimezone on save { create; update; field SAPTimezone; }
 
   determine action validateDate { validation validateValidTo; }
   determine action validateChild { validation Child ~ validatePercentage; }
@@ -46,9 +51,13 @@ etag master LocalLastChangedAt
   side effects {
     field IntegerValue affects field ProgressIntegerValue, field RadialIntegerValue;
     field NavigationID affects entity _Navigation;
+    action changeCriticality affects field CriticalityCode;
     action resetTimesChildCreated affects field TimesChildCreated, permissions ( action resetTimesChildCreated );
     determine action validateDate executed on field ValidTo affects messages;
     determine action validateChild executed on entity _Child affects messages;
+    field SAPTimezone affects field IANATimestamp, field IANATimezone;
+    field Timestamp affects field IANATimestamp;
+    action overwriteTimezone affects $self;
   }
 
   mapping for /dmo/fsa_root_a corresponding {
@@ -76,7 +85,9 @@ etag master LocalLastChangedAt
     TargetValue = target_value;
     TimesChildCreated = times_child_created;
     TotalPieces = total_pieces;
+    TotalGrandchildPieces = total_granddchild_pieces;
     UpdateHidden = update_hidden;
+    SAPTimezone = time_zone;
     ValidFrom = valid_from;
     ValidTo = valid_to;
     TypeAccp = type_accp;
@@ -151,7 +162,7 @@ lock dependent by _Root
 authorization dependent by _Root
 {
   update;
-  delete ( features : instance );
+  delete (features : instance);
 
   field ( readonly ) ParentId;
   field ( readonly, numbering : managed ) ID;
@@ -162,6 +173,7 @@ authorization dependent by _Root
 
   side effects {
     field ChildPieces affects field _Root.TotalPieces;
+    field BooleanProperty affects permissions ( delete );
   }
 
   association _Root { with draft; }
@@ -192,12 +204,19 @@ authorization dependent by _Root
   field ( readonly, numbering : managed ) ID;
   field ( readonly ) ParentId, RootId;
 
+  determination calculateGrandchildPieces on modify { field GrandchildPieces; }
+
   association _Root { with draft; }
   association _Child { with draft; }
+
+//  side effects {
+//    field GrandchildPieces affects field _Child._Root.TotalGrandchildPieces;
+//  }
 
   mapping for /dmo/fsa_gch_a corresponding{
     ParentID = parent_id;
     RootID = root_id;
     StringProperty = string_property;
+    GrandchildPieces = grandchild_pieces;
   }
 }

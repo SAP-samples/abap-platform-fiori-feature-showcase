@@ -20,4 +20,5 @@ define view entity /DMO/FSA_I_ContactVH
       @Consumption.filter.hidden: true
       @Consumption.valueHelpDefault.display: false
       _Country._Text[1: Language = $session.system_language].CountryName as CountryName
+     
 }

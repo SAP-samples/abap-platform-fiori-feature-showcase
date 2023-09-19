@@ -38,6 +38,12 @@
      <MSGNR>004</MSGNR>
      <TEXT>Child created from Action Overload</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/DMO/CM_FSA</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>Timezone given (&apos;&amp;1&apos;) is invalid</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

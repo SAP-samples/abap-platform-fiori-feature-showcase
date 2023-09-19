@@ -9,10 +9,12 @@ define behavior for /DMO/FSA_C_RootTP alias Root
   use update;
   use delete;
 
+  use action copyInstance;
   use action changeProgress;
   use action changeCriticality;
   use action resetTimesChildCreated;
   use action increaseTimesChildCreated;
+  use action overwriteTimezone;
 
   use action validateDate;
   use action validateChild;

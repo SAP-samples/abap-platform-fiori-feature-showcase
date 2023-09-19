@@ -319,75 +319,75 @@ CLASS lcl_abstract IMPLEMENTATION.
               ).
 
     lt_sur_name = VALUE #( ##NO_TEXT ##STRING_OK
-          ( `Buchholm`)
-          ( `Vrsic`)
-          ( `Jeremias`)
-          ( `Gutenberg`)
-          ( `Fischmann`)
-          ( `Columbo`)
-          ( `Neubasler`)
-          ( `Martin`)
-          ( `Detemple`)
-          ( `Barth`)
-          ( `Benz`)
-          ( `Hansmann`)
-          ( `Koslowski`)
-          ( `Wohl`)
-          ( `Koller`)
-          ( `Hoffen`)
-          ( `Dumbach`)
-          ( `Goelke`)
-          ( `Waldmann`)
-          ( `Mechler`)
-          ( `Buehler`)
-          ( `Heller`)
-          ( `Simonen`)
-          ( `Henry`)
-          ( `Marshall`)
-          ( `Legrand`)
-          ( `Jacqmain`)
-          ( `D´Oultrement`)
-          ( `Hunter`)
-          ( `Delon`)
-          ( `Kreiss`)
-          ( `Trensch`)
-          ( `Cesari`)
-          ( `Matthaeus`)
-          ( `Babilon`)
-          ( `Zimmermann`)
-          ( `Kramer`)
-          ( `Illner`)
-          ( `Pratt`)
-          ( `Gahl`)
-          ( `Benjamin`)
-          ( `Miguel`)
-          ( `Weiss`)
-          ( `Sessler`)
-          ( `Montero`)
-          ( `Domenech`)
-          ( `Moyano`)
-          ( `Sommer`)
-          ( `Schneider`)
-          ( `Eichbaum`)
-          ( `Gueldenpfennig`)
-          ( `Sudhoff`)
-          ( `Lautenbach`)
-          ( `Ryan`)
-          ( `Prinz`)
-          ( `Deichgraeber`)
-          ( `Pan`)
-          ( `Lindwurm`)
-          ( `Kirk`)
-          ( `Picard`)
-          ( `Sisko`)
-          ( `Madeira`)
-          ( `Meier`)
-          ( `Rahn`)
-          ( `Leisert`)
-          ( `Müller`)
-          ( `Mustermann`)
-          ( `Becker`)
-          ( `Fischer`)
+          ( `Buchholm` )
+          ( `Vrsic` )
+          ( `Jeremias` )
+          ( `Gutenberg` )
+          ( `Fischmann` )
+          ( `Columbo` )
+          ( `Neubasler` )
+          ( `Martin` )
+          ( `Detemple` )
+          ( `Barth` )
+          ( `Benz` )
+          ( `Hansmann` )
+          ( `Koslowski` )
+          ( `Wohl` )
+          ( `Koller` )
+          ( `Hoffen` )
+          ( `Dumbach` )
+          ( `Goelke` )
+          ( `Waldmann` )
+          ( `Mechler` )
+          ( `Buehler` )
+          ( `Heller` )
+          ( `Simonen` )
+          ( `Henry` )
+          ( `Marshall` )
+          ( `Legrand` )
+          ( `Jacqmain` )
+          ( `D´Oultrement` )
+          ( `Hunter` )
+          ( `Delon` )
+          ( `Kreiss` )
+          ( `Trensch` )
+          ( `Cesari` )
+          ( `Matthaeus` )
+          ( `Babilon` )
+          ( `Zimmermann` )
+          ( `Kramer` )
+          ( `Illner` )
+          ( `Pratt` )
+          ( `Gahl` )
+          ( `Benjamin` )
+          ( `Miguel` )
+          ( `Weiss` )
+          ( `Sessler` )
+          ( `Montero` )
+          ( `Domenech` )
+          ( `Moyano` )
+          ( `Sommer` )
+          ( `Schneider` )
+          ( `Eichbaum` )
+          ( `Gueldenpfennig` )
+          ( `Sudhoff` )
+          ( `Lautenbach` )
+          ( `Ryan` )
+          ( `Prinz` )
+          ( `Deichgraeber` )
+          ( `Pan` )
+          ( `Lindwurm` )
+          ( `Kirk` )
+          ( `Picard` )
+          ( `Sisko` )
+          ( `Madeira` )
+          ( `Meier` )
+          ( `Rahn` )
+          ( `Leisert` )
+          ( `Müller` )
+          ( `Mustermann` )
+          ( `Becker` )
+          ( `Fischer` )
       ).
 
     rv_name =
@@ -602,11 +602,11 @@ CLASS lcl_fsa_criticality IMPLEMENTATION.
 
   METHOD _generate.
     gt_criticality = VALUE #(
-        ( code = '0'  name = 'Neutral'   descr = 'Neutral'  ) ##NO_TEXT
-        ( code = '1'  name = 'Negative'  descr = 'Negative' ) ##NO_TEXT
-        ( code = '2'  name = 'Critical'  descr = 'Critical' ) ##NO_TEXT
-        ( code = '3'  name = 'Positive'  descr = 'Positive' ) ##NO_TEXT
-        ( code = '5'  name = 'New Item'  descr = 'New Item' ) ##NO_TEXT
+        ( code = '0'  name = 'Neutral'   descr = 'Criticality shown as grey'  ) ##NO_TEXT
+        ( code = '1'  name = 'Negative'  descr = 'Criticality shown as red' ) ##NO_TEXT
+        ( code = '2'  name = 'Critical'  descr = 'Criticality shown as orange' ) ##NO_TEXT
+        ( code = '3'  name = 'Positive'  descr = 'Criticality shown as green' ) ##NO_TEXT
+        ( code = '5'  name = 'New Item'  descr = 'Criticality shown as blue' ) ##NO_TEXT
       ).
   ENDMETHOD.
 
@@ -749,6 +749,12 @@ CLASS lcl_fsa_root IMPLEMENTATION.
         ENDIF.
       ENDIF.
 
+      TRY.
+          DATA(lv_timezone) = cl_abap_context_info=>get_user_time_zone( ).
+        CATCH cx_abap_context_info_error.
+          lv_timezone = |CET|.
+      ENDTRY.
+
       APPEND VALUE /dmo/fsa_root_a(
           id                        = get_uuid( )
           image_url                 = get_image_url( )
@@ -777,6 +783,7 @@ CLASS lcl_fsa_root IMPLEMENTATION.
           valid_to                  = cl_abap_context_info=>get_system_date( ) + get_int4( min = 0   max = 240 )
           time                      = cl_abap_context_info=>get_system_time( ) - get_int4( min = 0   max = 3600 )
           timestamp                 = lv_timestampl
+          time_zone                 = lv_timezone
           description               = get_string( 55 )
           description_customgrowing = get_string( 55 )
           navigation_id             = lcl_fsa_navigation=>get( )-id
@@ -969,6 +976,7 @@ CLASS lcl_fsa_grandchild IMPLEMENTATION.
         APPEND VALUE /dmo/fsa_gch_a(
             id              = get_uuid( )
             parent_id       = ls_child-id
+            root_id         = ls_child-parent_id
             string_property = get_string( 10 )
           ) TO gt_grandchild.
       ENDDO.

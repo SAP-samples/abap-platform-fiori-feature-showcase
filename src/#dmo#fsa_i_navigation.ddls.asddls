@@ -12,6 +12,7 @@
   typeImageUrl: 'sap-icon://blank-tag'
 }
 
+// Search Term #QuickView
 define view entity /DMO/FSA_I_Navigation
   as select from /dmo/fsa_nav
   association [0..1] to I_Country as _Country on $projection.Country = _Country.Country
@@ -28,7 +29,7 @@ define view entity /DMO/FSA_I_Navigation
           label: 'Navigational Properties'
         }
       ]
-      @UI.hidden: true
+      @UI.textArrangement: #TEXT_ONLY
       @ObjectModel.text.element: ['StringProperty'] // Search Term #DisplayTextAndID
   key id               as ID,
 

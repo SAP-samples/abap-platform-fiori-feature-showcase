@@ -16,7 +16,7 @@ define root view entity /DMO/FSA_R_RootTP
       IntegerValue   as RadialIntegerValue,
       ForecastValue,
       TargetValue,
-      Dimensions,
+      Dimensions, 
       
       @EndUserText.label: 'Progress Indicator'
       IntegerValue   as ProgressIntegerValue,
@@ -26,7 +26,7 @@ define root view entity /DMO/FSA_R_RootTP
 
       // Search Term #ValueHelps BEGIN
 
-      // Search Term #DependentFilter
+      // Search Term #DependentFilter 
       @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_I_Contact' , element: 'ID' },
                                            label: 'Contacts',
                                            additionalBinding: [{ element: 'Country',
@@ -40,32 +40,38 @@ define root view entity /DMO/FSA_R_RootTP
                                                                  usage: #RESULT }] }]
       CriticalityCode,
 
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_UnitOfMeasureStdVH', element: 'UnitOfMeasure' } }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_UnitOfMeasureStdVH', element: 'UnitOfMeasure' }
+                                            }]
       Uom,
 
       FieldWithQuantity,
 
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_CurrencyStdVH', element: 'Currency' } }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_CurrencyStdVH', element: 'Currency' }}]
       IsoCurrency,
 
-      // Search Term #CollectiveValueHelp
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_D_CountryCVH',  element: 'Country' },
+      // Search Term #CollectiveValueHelp 
+      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_D_CountryCVH',  element: 'Country'  },
                                            additionalBinding: [{ element: 'Region', 
                                                                  localElement: 'Region' }]  }]
       Country,
 
-      @Consumption.valueHelpDefinition: [{entity: { name: 'I_RegionVH', element: 'Region' },
-                                          additionalBinding: [{ element: 'Country',
-                                                                localElement: 'Country' }] }]
+      // Search Term #useForValidationVH 
+      @EndUserText.label: 'Region (#useForValidationVH):'
+      @Consumption.valueHelpDefinition: [{  entity: { name: 'I_RegionVH', element: 'Region' },
+                                            qualifier: 'RegionValueHelp', 
+                                            useForValidation: true, 
+                                            additionalBinding: [{ element: 'Country',
+                                                                  localElement: 'Country' }] }]
       Region,
 
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_I_Navigation', element: 'ID' } }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_I_Navigation', element: 'ID' } }] 
       NavigationID,
       // Search Term #ValueHelps END
 
       FieldWithCriticality,
       FieldWithPrice,
       FieldWithPrice as HarveyFieldWithPrice,
+      CriticalityNullValInd,
       DeleteHidden,
       UpdateHidden,
       FieldWithUrl,
@@ -75,11 +81,25 @@ define root view entity /DMO/FSA_R_RootTP
       ValidFrom,
       ValidTo,
       Time,
+      
+      // Search Term #IANATimezone
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_TimeZone', element: 'TimeZoneID' } }]
+      SAPTimezone,
+      
+      @Semantics.timeZone: true
+      SAPTimezone as IANATimezone,
+      
       Timestamp,
+      
+      @Semantics.timeZoneReference: 'IANATimezone' 
+      Timestamp as IANATimestamp,
+      // End Search Term #IANATimezone
+      
       Description,
       DescriptionCustomGrowing,
       TimesChildCreated,
       TotalPieces,
+      TotalGrandchildPieces,
       CreatedBy,
       CreatedAt,
       LocalLastChangedBy,
@@ -123,6 +143,7 @@ define root view entity /DMO/FSA_R_RootTP
       
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_UnitOfMeasureStdVH', element: 'UnitOfMeasure' } }]
       TypeUnit,
+      
       /* Associations */
       _Contact,
       _Country,
