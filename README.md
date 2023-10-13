@@ -33,6 +33,7 @@ Choose this if you are working on SAP S/4HANA, on-premise edition or SAP S/4HANA
 To import the feature showcase app into your ABAP system, follow the steps in the relevant README file and download the sources from the branch corresponding to your backend version: 
 
 * [README](../ABAP-platform-2022/README.md) of branch <em>ABAP-platform-2022</em> (Application Server ABAP 7.57)
+* [README](../ABAP-platform-2023/README.md) of branch <em>ABAP-platform-2023</em> (Application Server ABAP 7.58)
 
 ## SAP BTP ABAP Environment Trial
 
