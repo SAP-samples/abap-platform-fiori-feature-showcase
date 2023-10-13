@@ -10,6 +10,8 @@ CLASS /dmo/fsa_cl_data_generator DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
+    CLASS-DATA: gv_out TYPE REF TO if_oo_adt_classrun_out.
+
     CLASS-METHODS: _delete_table_content.
     CLASS-METHODS: _delete_bo_data.
 
@@ -19,14 +21,17 @@ ENDCLASS.
 
 CLASS /dmo/fsa_cl_data_generator IMPLEMENTATION.
 
+
   METHOD if_oo_adt_classrun~main.
+    gv_out = out.
     generate_random_data( ).
-    out->write( |Data generation: Completed| ) ##NO_TEXT .
+    gv_out->write( `Data generation: Completed` ) ##NO_TEXT .
   ENDMETHOD.
 
+
   METHOD _delete_bo_data.
-    SELECT FROM /dmo/fsa_root_a
-      FIELDS id INTO TABLE @DATA(lt_actives). "#EC CI_NOWHERE
+    SELECT * FROM /dmo/fsa_root_a
+      INTO TABLE @DATA(lt_actives). "#EC CI_NOWHERE
 
     CHECK lt_actives IS NOT INITIAL.
 
@@ -42,16 +47,18 @@ CLASS /dmo/fsa_cl_data_generator IMPLEMENTATION.
           REPORTED DATA(reported).
 
       COMMIT ENTITIES.
+
+      IF sy-subrc <> 0.
+        gv_out->write( `Error deleting draft instances` ) ##NO_TEXT .
+      ENDIF.
     ENDIF.
 
-    MODIFY ENTITIES OF /DMO/FSA_R_RootTP
-      ENTITY Root
-        UPDATE
-          FIELDS ( DeleteHidden )
-          WITH VALUE #( FOR active IN lt_actives (  %key-id = active-id
-                                                    DeleteHidden = abap_false ) )
-        FAILED failed
-        REPORTED reported.
+    LOOP AT lt_actives ASSIGNING FIELD-SYMBOL(<fs_active>).
+      <fs_active>-delete_hidden = abap_false.
+      <fs_active>-update_hidden = abap_false.
+    ENDLOOP.
+
+    UPDATE /dmo/fsa_root_a FROM TABLE @lt_actives.
 
     MODIFY ENTITIES OF /DMO/FSA_R_RootTP
       ENTITY Root

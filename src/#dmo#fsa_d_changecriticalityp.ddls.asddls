@@ -1,7 +1,6 @@
 @EndUserText.label: 'Change criticality parameter'
 define abstract entity /DMO/FSA_D_ChangeCriticalityP
 {
-    @EndUserText.label: 'Change Criticality'
     // Search Term #ValueHelpParameter
     @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_I_Criticality',  element: 'Code' }}]
     // Search Term #ParameterDefaultValue

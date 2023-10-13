@@ -1,6 +1,7 @@
-projection;
+projection implementation in class /dmo/fsa_bp_c_roottp unique;
 strict ( 2 );
 use draft;
+use side effects;
 
 define behavior for /DMO/FSA_C_RootTP alias Root
 {
@@ -8,8 +9,17 @@ define behavior for /DMO/FSA_C_RootTP alias Root
   use update;
   use delete;
 
+  use action copyInstance;
   use action changeProgress;
   use action changeCriticality;
+  use action resetTimesChildCreated;
+  use action increaseTimesChildCreated;
+  use action overwriteTimezone;
+
+  use action validateDate;
+  use action validateChild;
+
+  action ( features : instance ) createChildFromRoot result [0..1] entity /DMO/FSA_C_ChildTP;
 
   use action Prepare;
   use action Edit;
@@ -19,6 +29,10 @@ define behavior for /DMO/FSA_C_RootTP alias Root
 
   use association _Chart { create; with draft; }
   use association _Child { create; with draft; }
+
+  side effects {
+    action createChildFromRoot affects entity _Child, field TimesChildCreated, permissions ( action resetTimesChildCreated );
+  }
 }
 
 define behavior for /DMO/FSA_C_ChartTP alias Chart

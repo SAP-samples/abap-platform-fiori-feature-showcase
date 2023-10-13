@@ -1,0 +1,8 @@
+abstract;
+strict ( 2 );
+with hierarchy;
+
+define behavior for /DMO/FSA_D_OverwriteTimezoneP with control
+{
+  field (mandatory:execute) sap_timezone;
+}

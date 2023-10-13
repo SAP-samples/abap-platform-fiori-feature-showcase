@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>/DMO/CM_FSA</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>Feature Showcase App Messages</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/DMO/CM_FSA</ARBGB>
+     <MSGNR>000</MSGNR>
+     <TEXT>&amp;1 &amp;2 &amp;3 &amp;4</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/DMO/CM_FSA</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>Valid To date &amp;1 is in the past</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/DMO/CM_FSA</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>Percentage should be more than 0.0</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/DMO/CM_FSA</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>Counter for children created from Action Overload reset successfully</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/DMO/CM_FSA</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>Child created from Action Overload</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>/DMO/CM_FSA</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>Timezone given (&apos;&amp;1&apos;) is invalid</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>

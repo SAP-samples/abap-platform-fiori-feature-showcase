@@ -24,7 +24,7 @@ A corresponding app built using CAP can be found at https://github.com/SAP-sampl
 
 ## Prerequisites
 Make sure to fulfill the following requirements:
-* You are working on Application Server ABAP 7.57 or higher. 
+* You are working on Application Server ABAP 7.58 or higher. 
 * You have downloaded and installed ABAP Development Tools (ADT). Make sure to use the most recent version as indicated on the [installation page](https://tools.hana.ondemand.com/#abap). 
 * You have created an ABAP Project in ADT that allows you to access your Application Server as mentioned above. Your log-on language is English.
 * You have downloaded and installed the `zabapgit_standalone` report. Make sure to use the most recent version as indicated on the [installation page](https://docs.abapgit.org/). 
@@ -56,7 +56,7 @@ Use the <em>zabapgit_standalone</em> program to install the <em>Feature Showcase
 1.	In your ABAP project, create the package `/DMO/FEATURE_SHOWCASE_APP` as target package for the demo content. Use `HOME` as software component. Assign it to a new transport request that you only use for the demo content import. 
 2.	In your ABAP project, run the program `zabapgit_standalone`.  
 3.	Choose `New Online` and enter the following URL of this repository  `https://github.com/SAP-samples/abap-platform-fiori-feature-showcase.git`. 
-4.	In the package field, enter the newly created package `/DMO/FEATURE_SHOWCASE_APP`. In the branch field, select the branch `ABAP-platform-2022`.
+4.	In the package field, enter the newly created package `/DMO/FEATURE_SHOWCASE_APP`. In the branch field, select the branch `ABAP-platform-2023`.
 5.	Leave the other fields unchanged and choose `Create Online Repo`.
 6. Enter your credentials for abapgit. You will see the available artifacts to import into your ABAP system. 
 7.	Choose `Pull` and confirm every subpackage on your transport request. 

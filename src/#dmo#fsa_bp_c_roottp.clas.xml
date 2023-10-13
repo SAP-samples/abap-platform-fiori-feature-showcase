@@ -3,15 +3,15 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>/DMO/FSA_BP_R_ROOTTP</CLSNAME>
+    <CLSNAME>/DMO/FSA_BP_C_ROOTTP</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Behavior Implementation for /DMO/FSA_R_ROOTTP</DESCRIPT>
+    <DESCRIPT>Behavior Implementation for /DMO/FSA_C_ROOTTP</DESCRIPT>
     <CATEGORY>06</CATEGORY>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
-    <CLSDEFINT>/DMO/FSA_R_ROOTTP</CLSDEFINT>
+    <CLSDEFINT>/DMO/FSA_C_ROOTTP</CLSDEFINT>
    </VSEOCLASS>
   </asx:values>
  </asx:abap>

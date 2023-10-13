@@ -3,12 +3,26 @@
 annotate entity /DMO/FSA_C_GrandchildTP
   with 
 {
+  @UI.facet: [{ type: #IDENTIFICATION_REFERENCE }]
   @UI.hidden: true
   ID;
   
   @UI.hidden: true
   ParentID;
   
-  @UI.lineItem: [{ position: 10 }] // Search Term #OPTable
+  @UI.lineItem: [
+    // Search Term #OPTable
+    { 
+      position: 10 
+    }
+  ] 
+  @UI.identification: [{ position: 10 }]
   StringProperty;
+  
+//  // Search Term #SideEffects ( target path more than one association )
+//  @UI.lineItem: [{ 
+//    position: 20 
+//  }] 
+//  @UI.identification: [{ position: 20 }]
+//  GrandchildPieces;
 }

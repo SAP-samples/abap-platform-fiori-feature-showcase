@@ -1,4 +1,4 @@
-@EndUserText.label: 'Chart TP'
+@EndUserText.label: 'Chart TP2'
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @Metadata.allowExtensions: true
 

@@ -17,6 +17,7 @@ define view entity /DMO/FSA_I_Child
       @EndUserText.label : 'Boolean Property'
       boolean_property   as BooleanProperty,
 
+      @ObjectModel.foreignKey.association: '_Criticality'
       criticality_code   as CriticalityCode,
       
       @EndUserText.label : 'Stream File'
@@ -27,6 +28,9 @@ define view entity /DMO/FSA_I_Child
       
       @EndUserText.label : 'Stream Mime Type'
       stream_mimetype    as StreamMimeType,
+      
+      @EndUserText.label : 'Child Pieces'
+      child_pieces       as ChildPieces,
       
       _Criticality
 

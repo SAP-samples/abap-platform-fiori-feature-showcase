@@ -13,7 +13,7 @@ define view entity /DMO/FSA_I_Contact
   key id            as ID,
 
       @Semantics.name.fullName: true
-      @Consumption.valueHelpDefault.display:false
+      @Consumption.valueHelpDefault.display:true
       name          as Name,
 
       @Semantics.telephone.type: [#PREF]
@@ -37,7 +37,7 @@ define view entity /DMO/FSA_I_Contact
       @UI.textArrangement: #TEXT_ONLY
       @EndUserText.label: 'Country'
       country       as CountryDisplay, // needed, to show country in VH list
-
+      
       @Semantics.address.street: true
       @Consumption.valueHelpDefault.display:true
       street        as Street,

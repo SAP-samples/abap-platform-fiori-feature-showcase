@@ -9,5 +9,8 @@ define view entity /DMO/FSA_I_Grandchild
       root_id         as RootID,
 
       @EndUserText.label : 'String Property'
-      string_property as StringProperty
+      string_property as StringProperty,
+      
+      @EndUserText.label : 'Grandchild Pieces'
+      grandchild_pieces as GrandchildPieces
 }

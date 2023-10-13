@@ -16,13 +16,15 @@ define view entity /DMO/FSA_C_ChildTP
       FieldWithPercent,
       BooleanProperty,
       CriticalityCode,
+      ChildPieces,
+      
       StreamFilename, // Search Term #Stream
       
       // Search Term #Stream
       @Semantics.largeObject: {
         acceptableMimeTypes: [ 'image/*', 'application/*' ],
         cacheControl.maxAge: #MEDIUM,
-        contentDispositionPreference: #INLINE, // #ATTACHMENT - download as file
+        contentDispositionPreference: #ATTACHMENT , // #ATTACHMENT - download as file
                                                    // #INLINE - open in new window
         fileName: 'StreamFilename',
         mimeType: 'StreamMimeType'
@@ -32,6 +34,8 @@ define view entity /DMO/FSA_C_ChildTP
       // Search Term #Stream
       @Semantics.mimeType: true
       StreamMimeType,
+      
+      _Root.TotalGrandchildPieces,
       
       /* Associations */
       _Criticality,
