@@ -2,19 +2,22 @@
 
 ## Content
 - [Object Page - General Features](#object-page---general-features)
-    - [Annotations for Data Fields](#annotations-for-data-fields)
-        - [Communication Properties](#communication-properties)
-        - [Time and Date](#time-and-date)
-        - [Multi line Text](#multi-line-text)
-        - [Collective Value Help](#collective-value-help)
-    - [Side Effects](#side-effects)
-        - [Field affects field](#field-affects-field)
-        - [Field affects entity](#field-affects-entity)
-        - [Action affects field](#action-affects-field)
-        - [Action affects permission](#action-affects-permission)
-        - [Action affects entity](#action-affects-entity)
-        - [Determine action executed on field affects messages](#determine-action-executed-on-field-affects-messages)
-        - [Determine action executed on entity affects messages](#determine-action-executed-on-entity-affects-messages)
+  - [Annotations for Data Fields](#annotations-for-data-fields)
+    - [Communication Properties](#communication-properties)
+    - [Time and Date](#time-and-date)
+    - [Multi line Text](#multi-line-text)
+    - [Collective Value Help](#collective-value-help)
+  - [Side Effects](#side-effects)
+    - [Field affects field](#field-affects-field)
+    - [Field affects entity](#field-affects-entity)
+    - [Action affects field](#action-affects-field)
+    - [Action affects permission](#action-affects-permission)
+    - [Action affects entity](#action-affects-entity)
+    - [Determine action executed on field affects messages](#determine-action-executed-on-field-affects-messages)
+    - [Determine action executed on entity affects messages](#determine-action-executed-on-entity-affects-messages)
+    - [$self affects permission of association](#self-affects-permission-of-association)
+    - [Entity affects field (workaround)](#entity-affects-field-workaround)
+  - [Hiding Data Points](#hiding-data-points)
 
 ## Annotations for Data Fields
 
@@ -334,6 +337,51 @@ define behavior for /DMO/FSA_R_RootTP alias Root
 }
 ```
 
+> [!NOTE] 
+> Source: Behaviour Implementation **/DMO/FSA_BP_R_RootTP**
+
+```
+CLASS lhc_Root DEFINITION INHERITING FROM cl_abap_behavior_handler.
+  METHOD resetTimesChildCreated.
+    MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+      UPDATE
+          FIELDS ( TimesChildCreated )
+          WITH VALUE #( FOR key IN keys
+                          ( %tky                        = key-%tky
+                            TimesChildCreated           = 0
+                            %control-TimesChildCreated  = if_abap_behv=>mk-on ) )
+        FAILED failed
+        REPORTED reported.
+
+    LOOP AT keys ASSIGNING FIELD-SYMBOL(<key>).
+
+      APPEND VALUE #( %tky        = <key>-%tky
+                      %msg        = new_message( id       = '/DMO/CM_FSA'
+                                                 number   = 003
+                                                 severity = if_abap_behv_message=>severity-success )
+                      %action-resetTimesChildCreated = if_abap_behv=>mk-on ) TO reported-root.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD get_instance_features.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+        FIELDS ( UpdateHidden TimesChildCreated ) WITH CORRESPONDING #( keys )
+      RESULT DATA(roots)
+      FAILED failed.
+
+    result = VALUE #( FOR root IN roots
+                      ( %tky = root-%tky
+                        %action-resetTimesChildCreated  = COND #( WHEN root-UpdateHidden  = abap_true OR root-TimesChildCreated = 0
+                                                                    THEN if_abap_behv=>fc-o-disabled
+                                                                    ELSE if_abap_behv=>fc-o-enabled  )
+
+                      ) ).
+  ENDMETHOD.
+ENDCLASS.
+```
+
 ---
 
 ### Action affects entity
@@ -357,7 +405,7 @@ define behavior for /DMO/FSA_C_RootTP alias Root
 ```
 
 > [!NOTE] 
-> Source: Metadata Extension **/DMO/FSA_R_RootTP**
+> Source: Metadata Extension **/DMO/FSA_C_RootTP**
 
 ```
 annotate entity /DMO/FSA_C_RootTP with
@@ -429,7 +477,188 @@ define behavior for /DMO/FSA_R_ChildTP alias Child
 }
 ```
 
-More Information: [ABAP RESTful Application Programming Model - Side Effects](https://help.sap.com/docs/btp/sap-abap-restful-application-programming-model/side-effects)
+---
+
+### $self affects permission of association
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/SideEffects/se-self-a-entity.gif" title="Side Effects - Determine Action executed on Entity affects Messages" />
+
+When any fields from $self is modified, the permission/feature control of the association will be refreshed. In our example, when the boolean property `DisableChildOperation` is checked, the list of child instances will be refreshed and update is disabled.
+
+> [!NOTE] 
+> Source: Behaviour Definition **/DMO/FSA_R_RootTP**
+
+```
+define behavior for /DMO/FSA_R_RootTP alias Root
+...
+{
+  side effects {
+    $self affects permissions ( update _Child );
+  }
+}
+
+define behavior for /DMO/FSA_R_ChildTP alias Child
+...
+{
+  update (features : instance);
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Implementation **/DMO/FSA_BP_R_RootTP**
+
+```
+CLASS lhc_child DEFINITION INHERITING FROM cl_abap_behavior_handler.
+  METHOD get_instance_features.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Child BY \_Root
+        FIELDS ( DisableChildOperation )
+        WITH CORRESPONDING #( keys )
+      RESULT DATA(roots)
+      ENTITY Child
+        FIELDS ( BooleanProperty )
+        WITH CORRESPONDING #(  keys  )
+      RESULT DATA(children).
+
+    DATA(lv_boolean) = roots[ 1 ]-DisableChildOperation.
+
+    result = VALUE #( FOR child IN children
+                        ( %tky              = child-%tky
+                          %update           = COND #( WHEN lv_boolean  = abap_true
+                                                        THEN if_abap_behv=>fc-o-disabled
+                                                        ELSE if_abap_behv=>fc-o-enabled  )
+                         ) ).
+  ENDMETHOD.
+ENDCLASS.
+```
+
+---
+
+### Entity affects field (workaround)
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/SideEffects/se-entity-a-field-workaround.gif" title="Side Effects - Entity affects Field (Workaround)" />
+
+When an instance of an associated entity is deleted, a field should be updated. While there is no dedicated syntax to cater for this use case, this can be achieved with a workaround by defining a determination that is always called by a determine action, with side effect defined for the determine action.
+
+In our example, updating `ChildPieces` at the associated entity `_Child` will update the field `TotalPieces` of the `Root` entity.
+
+> [!NOTE] 
+> Source: Behaviour Definition **/DMO/FSA_R_RootTP**
+
+```
+define behavior for /DMO/FSA_R_RootTP alias Root
+...
+determination updateTimesChildCreated on save { create; }
+
+determine action updateTimes { determination ( always ) updateTimesChildCreated; }
+
+{
+  side effects {
+    determine action updateTimes executed on entity _Child affects field TotalPieces;
+  }
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Implementation **/DMO/FSA_BP_R_RootTP**
+
+```
+METHOD updateTimesChildCreated.
+  READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+    ENTITY Root BY \_Child
+      FIELDS ( ChildPieces ) WITH CORRESPONDING #( keys )
+    RESULT DATA(children).
+
+  MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+    ENTITY Root
+      UPDATE
+        FIELDS ( TotalPieces )
+        WITH VALUE #( FOR key IN keys
+                        ( %tky                 = key-%tky
+                          TotalPieces          = REDUCE i( INIT val TYPE i
+                                                            FOR child IN children
+                                                            NEXT val += child-ChildPieces )
+                          %control-TotalPieces = if_abap_behv=>mk-on ) )
+    FAILED DATA(upd_failed)
+    REPORTED DATA(upd_reported).
+
+  reported = CORRESPONDING #( DEEP upd_reported ).
+ENDMETHOD.
+```
+
+More Information: 
+- [ABAP RESTful Application Programming Model - Side Effects](https://help.sap.com/docs/btp/sap-abap-restful-application-programming-model/side-effects)
+- [ABAP Cloud: RAP Side Effects](https://www.youtube.com/watch?v=yh_pje7ry0U)
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
+## Hiding Data Points
+
+*Search term:* `#DatapointHidden`
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/datapoint_hidden.jpg" title="Datapoint Hidden" />
+
+If you are showing data points in the sections of your object page, it is possible to hide them using annotation `@UI.datapoint.hidden`, either with a constant `true` or with a reference to a boolean property.
+
+In this example, `Email` and `Telephone` will be hidden when the root instance is not updateable.
+
+> [!CAUTION]
+> There is a limitation with using this annotation at the header section. Refer to [Constraints](../../../fiori-feature-showcase-app/wiki/Identified-Constraints)
+
+> [!NOTE] 
+> Source: Metadata Extension **/DMO/FSA_C_RootTP**
+
+```
+annotate entity /DMO/FSA_C_RootTP with
+{
+  @UI.facet: [
+    // Search Term #DatapointHidden
+    {
+      purpose: #STANDARD,
+      type: #COLLECTION,
+      label: 'Communication (#DatapointHidden)',
+      id: 'datapointHidden',
+      parentId: 'Nested'
+    },
+    { 
+      parentId: 'datapointHidden',
+      type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'Email'
+    },
+    { 
+      parentId: 'datapointHidden',
+      type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'Telephone'
+    }
+  ]
+
+  ...
+  UpdateHidden;
+
+  //  Search Term #DatapointHidden
+  @UI.dataPoint: { 
+    title: 'Email (#DatapointHidden)',
+    qualifier: 'Email',
+    hidden: #(UpdateHidden) 
+  }
+  @EndUserText.label: 'Email (#DatapointHidden)'
+  Email;
+
+  //  Search Term #DatapointHidden
+  @UI.dataPoint: { 
+    title: 'Telephone (#DatapointHidden)',
+    qualifier: 'Telephone',
+    hidden: #(UpdateHidden) 
+  }
+  @EndUserText.label: 'Telephone (#DatapointHidden)'
+  Telephone;
+}
+```
 
 :arrow_up_small: [Back to Content](#content)
 

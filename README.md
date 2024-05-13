@@ -40,7 +40,7 @@ If you don’t have a system available, you could also try it out in the SAP BTP
 
 ## :book: How To... Use the Guide
 
-The Guide is divided into 6 sections
+The Updated Guide is divided into 6 sections. You can peruse it on your own without refering to the app, based on what you want to implement.
 
 | Documentation | Description |
 | ----- | ----- |
@@ -51,9 +51,19 @@ The Guide is divided into 6 sections
 | [Object Page - Header](/05_object_page_header.md)  | Describes the features that are for the header area of the Object Page  |
 | [Object Page - Content](/06_object_page_content.md)  | Describes the features that are for the content area of the Object Page  |
 
-When you see a feature that you would like to implement, copy or take note of the search term (e.g., **#SearchTermExample**) and perform a search in the Repository. Clicking on a result brings you to the markdown code of the respective Guide, so just click on the Preview and search for the term again.
+For searching via the search term from the App, there are 2 ways:
 
-<img src="/Images/search.gif" alt="How to search" title="How to search" >
+### If you have a user in GitHub
+
+...when you see a feature that you would like to implement, copy or take note of the search term (e.g., **#SearchTermExample**) and perform a search in the Repository. Clicking on a result brings you to the markdown code of the respective Guide, so just click on the Preview and search for the term again.
+
+<img src="/Images/search.gif" alt="How to search" title="How to Search - The New Guide" >
+
+### If you *don't* have a user in GitHub
+
+...you can still use the old way and search in the [Wiki](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/wiki/Feature-Showcase-App-Guide) instead.
+
+<img src="/Images/old_search.gif" alt="How to search" title="How to Search - The Old Way" >
 
 From the Guide, you will get 
 
@@ -61,7 +71,7 @@ From the Guide, you will get
 * code snippets and where to find them in the source code, 
 * and in some cases, a link to the official RAP documentation for more information.
 
-Alternatively, you can search for an annotation in the Guide, get the search term, and use it to locate the UI feature in the app. If the annotation cannot be found, it could simply mean that it is not showcased in the current release.
+Alternatively, you can search for an annotation in the Guide/Wiki, get the search term, and use it to locate the UI feature in the app. If the annotation cannot be found, it could simply mean that it is not showcased in the current release.
 
 <br/>
 

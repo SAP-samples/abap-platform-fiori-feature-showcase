@@ -25,9 +25,39 @@
         - [Adding Images to a Table](#adding-images-to-a-table)
         - [Adding Currency or UoM Fields to a Table](#adding-currency-or-uom-fields-to-a-table)
         - [Adding Large Object/Stream Property to a Table](#adding-large-objectstream-property-to-a-table)
+          - [Static Field Control for Large Object/Stream Property](#static-field-control-for-large-objectstream-property)
+          - [Dynamic Field Control for Large Object/Stream Property](#dynamic-field-control-for-large-objectstream-property)
         - [Adding Navigation with URL to a Table](#adding-navigation-with-url-to-a-table)
 
 ## Configuring Tables
+
+To see columns in your table, you would first have to define them with the annotation `@UI.lineItem` at the property, either in the CDS view or in a metadata extension. The most basic setting you can use would be:
+- the order of the column in the table and 
+- changing the column label, if you do not want to use the label from underlying views.
+
+In the example below, `StringProperty` would be the second column in the table (the numbering used here is 10, 20, etc. You could also start with 1, 2, etc. ), defined using `position`. `label` would be the column label/heading.
+
+`importance` denotes the importance of the property. With `#HIGH`, this means that the property will always be shown even if the table is rendered on a small display.
+
+> [!NOTE] 
+> Source: Metadata Extension **/DMO/FSA_C_RootTP**
+
+```
+@UI.lineItem: [
+  {
+    position: 20,
+    importance: #HIGH,
+    label: 'Field with Sem. Key(#SemanticKey)'
+  }
+]
+StringProperty;
+```
+
+More information: [ABAP RESTful Application Programming Model - Tables](https://help.sap.com/docs/abap-cloud/abap-rap/tables)
+
+:arrow_up_small: [Back to Content](#content)
+
+---
 
 ### Actions - List
 
@@ -877,6 +907,207 @@ mapping for /dmo/fsa_child_a {
 ```
 
 More Information: [ABAP RESTful Application Programming Model - Working with Large Objects](https://help.sap.com/docs/btp/sap-abap-restful-application-programming-model/working-with-large-objects)
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
+#### Static Field Control for Large Object/Stream Property
+
+*Search term:* `#StreamStaticFeatureCtrl`
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/lr_stream_static_fc.jpg" title="Streams - Static Feature Control" />
+
+It is possible to enable static field control for your large object property/attachment. This is done by adding the control in the behaviour definition.
+
+In our example, we have set the stream property to readonly.
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_C_ChildTP**
+
+```
+// Search Term #StreamStaticFeatureCtrl
+@Semantics.largeObject: {
+  acceptableMimeTypes: [ 'image/*', 'application/*' ],
+  cacheControl.maxAge: #MEDIUM,
+  contentDispositionPreference: #ATTACHMENT , // #ATTACHMENT - download as file
+                                              // #INLINE - open in new window
+  fileName: 'StreamFilename',
+  mimeType: 'StreamMimeType'
+}
+StreamFileReadonly,
+
+StreamFilename, 
+
+@Semantics.mimeType: true
+StreamMimeType,
+```
+
+> [!NOTE] 
+> Source: Metadata Extension **/DMO/FSA_C_ChildTP**
+
+```
+// Search Term #StreamStaticFeatureCtrl
+@UI: {
+  lineItem: [
+    { 
+      position: 70, 
+      label: 'Attachment (#StreamStaticFeatureCtrl)' 
+    }
+  ]
+}
+StreamFileReadonly;
+
+// Search Term #Stream
+@UI.hidden: true
+StreamMimeType;
+
+// Search Term #Stream
+@UI.hidden: true
+StreamFilename;
+```
+
+> [!NOTE] 
+> Source: BDEF **/DMO/FSA_R_ROOTTP**
+
+```
+define behavior for /DMO/FSA_R_ChildTP alias Child .. {
+  field ( readonly ) StreamFileReadonly; // Search Term #StreamStaticFeatureCtrl
+}
+```
+
+More Information: [ABAP RESTful Application Programming Model - Static Feature Control](https://help.sap.com/docs/btp/sap-abap-restful-application-programming-model/instance-feature-control#static-feature-control)
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
+#### Dynamic Field Control for Large Object/Stream Property
+
+*Search term:* `#StreamDynamicFeatureCtrl`
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/lr_stream_dynamic_fc.jpg" title="Streams - Dynamic Feature Control" />
+
+It is possible to enable dynamic field control for your large object property/attachment. This is done by adding the control in the behaviour definition.
+
+In our example, we set the stream property to readonly, when the boolean property `StreamIsReadOnly` is set to `true`. This can only be done when creating a new child instance, as the property `StreamIsReadOnly` itself has field control `readonly : update, mandatory : create`.
+
+> [!NOTE] 
+> Source: Database Table **/DMO/FSA_ChildA**
+
+```
+stream_filename    : abap.char(128);
+stream_mimetype    : abap.char(128);
+stream_file        : abap.rawstring(0);
+stream_is_readonly : abap_boolean;
+```
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_C_ChildTP**
+
+```
+StreamIsReadOnly, // Search Term #StreamDynamicFeatureCtrl
+StreamFilename, // Search Term #Stream
+
+// Search Term #Stream
+@Semantics.largeObject: {
+  acceptableMimeTypes: [ 'image/*', 'application/*' ],
+  cacheControl.maxAge: #MEDIUM,
+  contentDispositionPreference: #INLINE, // #ATTACHMENT - download as file
+                                             // #INLINE - open in new window
+  fileName: 'StreamFilename',
+  mimeType: 'StreamMimeType'
+}
+StreamFile,
+
+// Search Term #Stream
+@Semantics.mimeType: true
+StreamMimeType,
+```
+
+> [!NOTE] 
+> Source: Metadata Extension **/DMO/FSA_C_ChildTP**
+
+```
+// Search Term #StreamDynamicFeatureCtrl
+@UI: {
+  lineItem: [
+    { 
+      position: 50, 
+      label: 'Stream readonly? (#StreamDynFeatureCtrl)' 
+    }
+  ]
+}
+@EndUserText: { 
+  label: 'Stream readonly? Caution - cannot be changed after create',
+  quickInfo: 'Stream readonly?'
+}
+StreamIsReadOnly;
+
+// Search Term #Stream
+@UI.hidden: true
+StreamMimeType;
+
+@UI: {
+  // Search Term #StreamTable
+  lineItem: [
+    { 
+      position: 60, 
+      label: 'Attachment (#StreamTable)' 
+    }
+  ]
+}
+StreamFile;
+
+// Search Term #Stream
+@UI.hidden: true
+StreamFilename;
+```
+
+> [!NOTE] 
+> Source: BDEF **/DMO/FSA_R_ROOTTP**
+
+```
+define behavior for /DMO/FSA_R_ChildTP alias Child ... {
+  field ( readonly : update, mandatory : create ) StreamIsReadOnly;
+  ...
+  mapping for /dmo/fsa_child_a {
+    StreamFile = stream_file;
+    StreamFilename = stream_filename;
+    StreamMimeType = stream_mimetype;
+  }
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Implementation **/DMO/FSA_BP_R_ROOTTP**
+
+```
+CLASS lhc_child IMPLEMENTATION.
+  METHOD get_instance_features.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Child
+        FIELDS ( StreamIsReadOnly )
+        WITH CORRESPONDING #(  keys  )
+      RESULT DATA(children).
+
+    result = VALUE #( FOR child IN children
+                        ( %tky              = child-%tky
+                          %field-StreamFile = COND #( WHEN child-StreamIsReadOnly  = abap_true
+                                                        THEN if_abap_behv=>fc-f-read_only
+                                                        ELSE if_abap_behv=>fc-f-unrestricted  )
+                         ) ).
+  ENDMETHOD.
+ENDCLASS.
+```
+
+More Information: [ABAP RESTful Application Programming Model - Dynamic Feature Control](https://help.sap.com/docs/btp/sap-abap-restful-application-programming-model/instance-feature-control#dynamic-feature-control)
 
 :arrow_up_small: [Back to Content](#content)
 

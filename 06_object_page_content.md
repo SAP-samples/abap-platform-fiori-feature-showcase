@@ -12,7 +12,11 @@
     - [Selection Variant - Object Page](#selection-variant---object-page)
     - [Selection Presentation  Variant - Object Page](#selection-presentation-variant---object-page)
     - [Connected Fields](#connected-fields)
+    - [Large Object/Stream Property](#large-objectstream-property)
+      - [Static Field Control for Large Object/Stream Property](#static-field-control-for-large-objectstream-property)
+      - [Dynamic Field Control for Large Object/Stream Property](#dynamic-field-control-for-large-objectstream-property)
     - [Determining Actions](#determining-actions)
+    - [RAP Treeview for Hierarchy](#rap-treeview-for-hierarchy)
   - [Forms](#forms)
     - [Actions in Section](#actions-in-section)
     - [Inline Actions in Form](#inline-actions-in-form)
@@ -242,7 +246,7 @@ To use presentation variant for a child entity in the object page, it is necessa
 @UI.facet: [
   {
     purpose: #STANDARD,
-    type: #RESENTATIONVARIANT_REFERENCE,
+    type: #PRESENTATIONVARIANT_REFERENCE,
     targetElement: '_Child',
     targetQualifier: 'pVariant',
     label: 'Child Entity (1..n)(#OPTable)',
@@ -366,6 +370,302 @@ IntegerValue;
 
 ---
 
+## Large Object/Stream Property
+
+*Search term:* `#Stream`
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/op_streams.jpg" title="Large Object/Streams - Object Page" />
+
+You can enable your RAP application for maintaining large objects (LOBs). By doing so, you provide end users the option to incorporate external binary files or text files when editing entity instances. First the appropriate fields should be added into the database table and the CDS view, and also the annotations `@Semantics.largeObject` and `@Semantics.mimeType`.  To show it in a standard or header facet, you will need annotation `@UI.facet`. Lastly, you should also update the mapping and the draft table in your behaviour definition.
+
+> [!NOTE] 
+> Source: Database Table **/DMO/FSA_ChildA**
+
+```
+stream_filename    : abap.char(128);
+stream_mimetype    : abap.char(128);
+stream_file        : abap.rawstring(0);
+```
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_C_ChildTP**
+
+```
+StreamFilename, // Search Term #Stream
+
+// Search Term #Stream
+@Semantics.largeObject: {
+  acceptableMimeTypes: [ 'image/*', 'application/*' ],
+  cacheControl.maxAge: #MEDIUM,
+  contentDispositionPreference: #INLINE, // #ATTACHMENT - download as file
+                                             // #INLINE - open in new window
+  fileName: 'StreamFilename',
+  mimeType: 'StreamMimeType'
+}
+StreamFile,
+
+// Search Term #Stream
+@Semantics.mimeType: true
+StreamMimeType,
+```
+
+> [!NOTE] 
+> Source: Metadata Extension **/DMO/FSA_C_ChildTP**
+
+```
+// Search Term #Stream
+@UI.facet: [
+  { 
+    purpose: #STANDARD,
+    type: #COLLECTION,
+    id: 'Collection',
+    label: 'Data'
+  },
+  {
+    purpose: #STANDARD
+    type: #FIELDGROUP_REFERENCE,
+    targetQualifier: 'Stream',
+    label: 'Large Object (#Stream)',
+    parentId: 'Collection'
+  }
+]
+
+// Search Term #Stream
+@UI.hidden: true
+StreamMimeType;
+
+@UI.fieldGroup: [{ position: 10, qualifier: 'Stream', label: 'Attachment (#Stream)' }] // Search Term #Stream
+StreamFile;
+
+// Search Term #Stream
+@UI.hidden: true
+StreamFilename;
+```
+
+> [!NOTE] 
+> Source: BDEF **/DMO/FSA_R_ROOTTP**
+
+```
+define behavior for /DMO/FSA_R_ChildTP alias Child {
+...
+mapping for /dmo/fsa_child_a {
+  ..
+  StreamFile = stream_file;
+  StreamFilename = stream_filename;
+  StreamMimeType = stream_mimetype;
+}
+```
+
+More Information on data modelling for Large Object: [ABAP RESTful Application Programming Model - Working with Large Objects](https://help.sap.com/docs/btp/sap-abap-restful-application-programming-model/working-with-large-objects)
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
+#### Static Field Control for Large Object/Stream Property
+
+*Search term:* `#StreamStaticFeatureCtrl`
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/op_stream_static_fc.jpg" title="Streams - Static Feature Control" />
+
+It is possible to enable static field control for your large object property/attachment. This is done by adding the control in the behaviour definition.
+
+In our example, we have set the stream property to readonly.
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_C_ChildTP**
+
+```
+// Search Term #StreamStaticFeatureCtrl
+@Semantics.largeObject: {
+  acceptableMimeTypes: [ 'image/*', 'application/*' ],
+  cacheControl.maxAge: #MEDIUM,
+  contentDispositionPreference: #ATTACHMENT , // #ATTACHMENT - download as file
+                                              // #INLINE - open in new window
+  fileName: 'StreamFilename',
+  mimeType: 'StreamMimeType'
+}
+StreamFileReadonly,
+
+StreamFilename, 
+
+@Semantics.mimeType: true
+StreamMimeType,
+```
+
+> [!NOTE] 
+> Source: Metadata Extension **/DMO/FSA_C_ChildTP**
+
+```
+// Search Term #StreamStaticFeatureCtrl
+@UI: {
+  fieldGroup: [
+    { 
+      position: 30, 
+      qualifier: 'Stream', 
+      label: 'Attachment (#StreamStaticFeatureCtrl)' 
+    }
+  ]
+}
+StreamFileReadonly;
+
+// Search Term #Stream
+@UI.hidden: true
+StreamMimeType;
+
+// Search Term #Stream
+@UI.hidden: true
+StreamFilename;
+```
+
+> [!NOTE] 
+> Source: BDEF **/DMO/FSA_R_ROOTTP**
+
+```
+define behavior for /DMO/FSA_R_ChildTP alias Child .. {
+  field ( readonly ) StreamFileReadonly; // Search Term #StreamStaticFeatureCtrl
+}
+```
+
+More Information: [ABAP RESTful Application Programming Model - Static Feature Control](https://help.sap.com/docs/btp/sap-abap-restful-application-programming-model/instance-feature-control#static-feature-control)
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
+#### Dynamic Field Control for Large Object/Stream Property
+
+*Search term:* `#StreamDynamicFeatureCtrl`
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/op_stream_dynamic_fc.jpg" title="Streams - Dynamic Feature Control" />
+
+It is possible to enable dynamic field control for your large object property/attachment. This is done by adding the control in the behaviour definition.
+
+In our example, we set the stream property to readonly, when the boolean property `StreamIsReadOnly` is set to `true`. This can only be done when creating a new child instance, as the property `StreamIsReadOnly` itself has field control `readonly : update, mandatory : create`.
+
+> [!NOTE] 
+> Source: Database Table **/DMO/FSA_ChildA**
+
+```
+stream_filename    : abap.char(128);
+stream_mimetype    : abap.char(128);
+stream_file        : abap.rawstring(0);
+stream_is_readonly : abap_boolean;
+```
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_C_ChildTP**
+
+```
+StreamIsReadOnly, // Search Term #StreamDynamicFeatureCtrl
+StreamFilename, // Search Term #Stream
+
+// Search Term #Stream
+@Semantics.largeObject: {
+  acceptableMimeTypes: [ 'image/*', 'application/*' ],
+  cacheControl.maxAge: #MEDIUM,
+  contentDispositionPreference: #INLINE, // #ATTACHMENT - download as file
+                                             // #INLINE - open in new window
+  fileName: 'StreamFilename',
+  mimeType: 'StreamMimeType'
+}
+StreamFile,
+
+// Search Term #Stream
+@Semantics.mimeType: true
+StreamMimeType,
+```
+
+> [!NOTE] 
+> Source: Metadata Extension **/DMO/FSA_C_ChildTP**
+
+```
+// Search Term #StreamDynamicFeatureCtrl
+@UI: {
+  fieldGroup: [
+    { 
+      position: 10, 
+      qualifier: 'Stream', 
+      label: 'Stream readonly? (#StreamDynFeatureCtrl)' 
+    }
+  ]
+}
+@EndUserText: { 
+  label: 'Stream readonly? Caution - cannot be changed after create',
+  quickInfo: 'Stream readonly?'
+}
+StreamIsReadOnly;
+
+// Search Term #Stream
+@UI.hidden: true
+StreamMimeType;
+
+@UI: {
+  // Search Term #Stream
+    fieldGroup: [
+    {
+      position: 10, 
+      qualifier: 'Stream', 
+      label: 'Attachment (#Stream)' 
+    }
+  ] 
+}
+StreamFile;
+
+// Search Term #Stream
+@UI.hidden: true
+StreamFilename;
+```
+
+> [!NOTE] 
+> Source: BDEF **/DMO/FSA_R_ROOTTP**
+
+```
+define behavior for /DMO/FSA_R_ChildTP alias Child ... {
+  field ( readonly : update, mandatory : create ) StreamIsReadOnly;
+  ...
+  mapping for /dmo/fsa_child_a {
+    StreamFile = stream_file;
+    StreamFilename = stream_filename;
+    StreamMimeType = stream_mimetype;
+  }
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Implementation **/DMO/FSA_BP_R_ROOTTP**
+
+```
+CLASS lhc_child IMPLEMENTATION.
+  METHOD get_instance_features.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Child
+        FIELDS ( StreamIsReadOnly )
+        WITH CORRESPONDING #(  keys  )
+      RESULT DATA(children).
+
+    result = VALUE #( FOR child IN children
+                        ( %tky              = child-%tky
+                          %field-StreamFile = COND #( WHEN child-StreamIsReadOnly  = abap_true
+                                                        THEN if_abap_behv=>fc-f-read_only
+                                                        ELSE if_abap_behv=>fc-f-unrestricted  )
+                         ) ).
+  ENDMETHOD.
+ENDCLASS.
+```
+
+More Information: [ABAP RESTful Application Programming Model - Dynamic Feature Control](https://help.sap.com/docs/btp/sap-abap-restful-application-programming-model/instance-feature-control#dynamic-feature-control)
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
 ### Determining Actions
 
 *Search term:* `#OPDetermineAction`
@@ -399,6 +699,219 @@ Determining actions are used to trigger actions directly using the context of th
 ```
 action changeCriticality parameter /DMO/FSA_D_ChangeCriticalityP result [1] $self;
 ```
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
+### RAP Treeview for Hierarchy
+
+*Search term:* `#RAPTreeview, #RAPTreeviewSection`
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/treeview.jpg" title="Treeview" />
+
+ABAP CDS allows for the structuring of data in hierarchies. For RAP, it is possible to display this CDS Hierarchy as a readonly treeview in the SAP Fiori UI, either as a list report which has a different implementation (an example can be found in [ABAP RESTful Application Programming Model: Implementing Treeviews](https://help.sap.com/docs/abap-cloud/abap-rap/implementing-hierarchical-view)) or in the object page, which will be described hereafter.
+
+The example implemented here represents a file folder system. Each folder has a parent folder, which is itself a 'normal' folder, and the topmost/root folder does not have a parent. Each folder is named with a combination of colour and number, and the name is used to sort the hiearchy. The root entity will serve as a 'directory' so that each instance has its own hierarchy which can be displayed in the object page.
+
+To implement this you would need the following artifacts:
+
+#### An underlying database table
+
+The `root_id` contains the id of the directory, in this case the root instance. `parent_folder` contains the `folder_id` of the parent.
+
+> [!NOTE] 
+> Source: Database table **/DMO/FSA_FLDR_A**
+
+```
+define table /dmo/fsa_fldr_a {
+
+  key client    : abap.clnt not null;
+  key root_id   : sysuuid_x16 not null;
+  key folder_id : sysuuid_c22 not null;
+  parent_folder : sysuuid_c22;
+  folder_name   : abap.char(1024);
+  folder_size   : abap.dec(10,2);
+
+}
+```
+
+#### A CDS view which represents the database table
+
+It serves as the source for the hierarchy, has a self-association and an association to the root entity, the directory. Annotations depicting how the treeview is shown in UI is also declared here. The most important annotation, `@OData.hierarchy.recursiveHierarchy` is required to specify the hierarchy. 
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_I_Folder**
+
+```
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: '(Hierarchy) Folder'
+
+// Search Term #RAPTreeview
+
+@OData.hierarchy.recursiveHierarchy: [{ entity.name: '/DMO/FSA_I_FolderHN' }]
+
+@UI: { 
+  headerInfo: {
+    typeName: 'Folder in Directory',
+    typeNamePlural: 'Folders in Directory',
+    title.value: 'FolderName'
+  },
+  presentationVariant: [
+    {
+      sortOrder: [{ by: 'FolderName', direction: #ASC }],
+      visualizations: [{type: #AS_LINEITEM}]
+    }
+  ]
+}
+
+define view entity /DMO/FSA_I_Folder
+  as select from /dmo/fsa_fldr_a
+  association         to one /DMO/FSA_I_Root   as _Directory    on  $projection.RootId        = _Directory.ID
+  association of many to one /DMO/FSA_I_Folder as _ParentFolder on  $projection.RootId        = _ParentFolder.RootId
+                                                                and $projection.ParentFolder  = _ParentFolder.FolderId
+{
+      @UI.facet: [{
+        purpose:       #STANDARD,
+        type:          #IDENTIFICATION_REFERENCE,
+        label:         'Folder (#RAPTreeview)',
+        position:      10
+      }]
+    
+      @UI.hidden: true
+  key root_id       as RootId,
+  
+      @UI.hidden: true
+  key folder_id     as FolderId,
+  
+      @UI: {
+        lineItem:       [{ 
+          position: 30, 
+          value: '_ParentFolder.FolderName',
+          label: 'Parent Folder' 
+        }],
+        identification: [{ 
+          position: 30, 
+          value: '_ParentFolder.FolderName',
+          label: 'Parent Folder'  
+        }]
+      }
+      @EndUserText.label : 'Parent Folder'
+      parent_folder as ParentFolder,
+      
+      @UI: {
+        lineItem:       [{ position: 10 }],
+        identification: [{ position: 10 }]
+      }
+      @EndUserText.label : 'Name of Folder'
+      folder_name   as FolderName,
+      
+      @UI: {
+        lineItem:       [{ position: 20 }],
+        identification: [{ position: 20 }]
+      }
+      @EndUserText.label : 'Size of Folder (in GB)'
+      folder_size   as FolderSize,
+      _Directory,
+      _ParentFolder
+}
+```
+
+#### The hierarchy
+
+The source of the hierarchy is `/DMO/FSA_I_Folder`. The parent of a node is defined via association `_ParentFolder`, which is a self-association. The hierarchy is filtered with parameter `P_Directory`, which is the `ID` of the root instance so that the correct hierarchy is shown in the object page of the instance. The topmost node is the one with an initial `ParentFolder` and the hierarchy is sorted by `FolderName`.
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_I_FolderHN**
+
+```
+define hierarchy /DMO/FSA_I_FolderHN
+  with parameters
+    P_Directory : sysuuid_x16
+    
+  as parent child hierarchy (
+    source /DMO/FSA_I_Folder
+    
+    child to parent association _ParentFolder
+    
+    directory _Directory filter by
+      RootId = $parameters.P_Directory
+    
+    start where ParentFolder is initial
+    
+    siblings order by FolderName
+  )
+{
+    key RootId,
+    key FolderId,
+        ParentFolder
+    
+}
+```
+
+The following artifacts must be modified:
+
+#### CDS View /DMO/FSA_I_Root, /DMO/FSA_R_RootTP and /DMO/FSA_C_RootTP
+
+An association to the hierarchy must be included in the root entity, since the root entity serves as a directory. The association `_Folder` need to be exposed up until the consumption view `/DMO/FSA_C_RootTP`.
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_I_Root**
+
+```
+define view entity /DMO/FSA_I_Root
+  ...
+  association of exact one to many /DMO/FSA_I_Folder as _Folder // Search Term #RAPTreeview
+    on $projection.ID = _Folder.RootId
+{
+  ...
+  _Folder,
+  ...
+}
+```
+
+#### Metadata Extension /DMO/FSA_C_RootTP
+
+A facet is added to show the treeview as a list report within the object page.
+
+> [!NOTE] 
+> Source: Metadata Extension **/DMO/FSA_C_FolderTP**
+
+```
+annotate entity /DMO/FSA_C_RootTP with
+{
+  @UI.facet: [
+    // Search Term #RAPTreeviewSection
+    {
+      purpose:       #STANDARD,
+      type:          #LINEITEM_REFERENCE,
+      label:         'File Folder System (#RAPTreeviewSection)',
+      targetElement: '_Folder'
+    }
+  ]
+}
+```
+
+#### Service Definition /DMO/UI_FeatureShowcaseApp
+
+The hierarchy CDS View should be exposed in the service.
+
+> [!NOTE] 
+> Source: Service Definition **/DMO/UI_FeatureShowcaseApp**
+
+```
+define service /DMO/UI_FeatureShowcaseApp {
+  ...
+  expose /DMO/FSA_I_Folder     as Folder;
+}
+```
+
+More Information: 
+- [ABAP Data Models: CDS Hierarchies](https://help.sap.com/docs/abap-cloud/abap-data-models/cds-hierarchies)
+- [ABAP RESTful Application Programming Model: Implementing Treeviews](https://help.sap.com/docs/abap-cloud/abap-rap/implementing-hierarchical-view)
 
 :arrow_up_small: [Back to Content](#content)
 
@@ -757,7 +1270,7 @@ If the section title and the table title are identical or the `@UI.headerInfo` a
 
 <img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/action_overload.jpg" title="Action Overload" />
 
-Action overload means to add an action bound to a higher level entity (parent), to the object page list table of a child entity. The action is defined in the parent behaviour definition, and the UI annotation to add the action is defined in the child CDS view or metadata extension. 
+Action overload means to add an action bound to another entity, to the object page list table of a child entity. The action is defined in the behaviour definition, and the UI annotation to add the action is defined in the other entity's CDS view or metadata extension. 
 
 The example given here, is an action button displayed at the Child entity table in section Child Entity (1..n)(#OPTable), that calls a Root action to create a new Child instance.
 

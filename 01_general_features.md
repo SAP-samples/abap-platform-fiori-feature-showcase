@@ -16,11 +16,16 @@
         - [Label for Action Parameter](#label-for-action-parameter)
         - [Using IANA Timezone in Action Parameter](#using-iana-timezone-in-action-parameter)
         - [Mandatory Parameter](#mandatory-parameter)
+        - [Default Values Function](#default-values-function)
     - [Recommended Data Types](#recommended-data-types)
     - [Setting up QuickView](#setting-up-quickview)
         - [QuickView with non-UUID key - NullValueIndicator](#quickview-with-non-uuid-key---nullvalueindicator)
     - [Export List Report to PDF](#export-list-report-to-pdf)
+    - [Export Treeview to PDF](#export-treeview-to-pdf)
     - [Leading Entity](#leading-entity)
+    - [AdaptationHidden](#adaptationhidden)
+    - [CDS Simple Type](#cds-simple-type)
+
 
 ## Using IANA Timezones
 
@@ -729,6 +734,203 @@ More information: [ABAP RESTful Application Programming Model - Modeling Paramet
 
 ---
 
+### Default Values Function
+
+*Search term:* `#DefaultFunctionForCreate, #DefaultFunctionForAction, #DefaultFunctionForCBA`
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+With a default values function you can default the input parameters for actions, functions, as well as create and create-by-association operations, similar to the annotation `@UI.defaultValue` (see [Default Value for action parameter](#default-value-for-action-parameter)). The difference here is, with default values function you can specify the values using more complicated coding.
+
+The general rules are:
+- Function name must begin with `GetDefaultsFor`
+- Function name must be unique within the current BDEF
+- In certain cases, external names can be given
+- Key word is `{default function GetDefaultsForxxx;}` behind the respective operation
+
+The importing parameter and the return type of the function need not be specified, as they will be derived by the framework from the respective actions/operations. If you have a projection layer, it is necessary to expose the default values function too in the projection BDEF.
+
+#### create
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/default_function_create.jpg" width="50%" height="50%" title="Default Values Function for Create" />
+
+In this example, the property `StringProperty`, which is a mandatory input for create, will be prefilled with the value `Default Value for Root Create`.
+
+Further rules:
+- Function name after the keyword `default function` is optional. When specified it **must** be `GetDefaultsForCreate`
+- External name is not possible
+
+> [!NOTE] 
+> Source: Behaviour Definition **/DMO/FSA_R_RootTP**
+
+```
+define behavior for /DMO/FSA_R_RootTP alias Root
+...
+{
+  // Search Term #DefaultFunctionForCreate
+  create { default function GetDefaultsForCreate; }
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Definition **/DMO/FSA_C_RootTP**
+
+```
+define behavior for /DMO/FSA_C_RootTP alias Root
+...
+{
+  use create;
+  use function GetDefaultsForCreate;
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Implementation **/DMO/FSA_BP_R_RootTP**
+
+```
+METHODS GetDefaultsForCreate FOR READ
+  IMPORTING keys FOR FUNCTION Root~GetDefaultsForCreate RESULT result.
+
+METHOD GetDefaultsForCreate.
+  result = VALUE #( FOR key IN keys
+                      ( %cid    = key-%cid
+                        %param  = VALUE #( StringProperty = 'Default Value for Root Create' ) ) ).
+ENDMETHOD.
+```
+
+#### create-by-association
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/default_function_cba.jpg" width="50%" height="50%" title="Default Values Function for Create-By-Association" />
+
+In this example, the property `StringProperty`, which is a mandatory input for Child create, will be prefilled with the value `Default Value for Child Create`. Property `FieldWithPercent` will also be prefilled to avoid triggering a validation error when saving (this is not shown in the pop up during create, but the code can be found in the behaviour implementation).
+
+Further rules:
+- `default function` must be specified in combination with create within curly brackets for an association.
+- External name is possible
+
+> [!NOTE] 
+> Source: Behaviour Definition **/DMO/FSA_R_RootTP**
+
+```
+define behavior for /DMO/FSA_R_RootTP alias Root
+...
+{
+  // Search Term #DefaultFunctionForCBA
+  association _Child { create { default function GetDefaultsForChild external 'GetDefaultsForCreateByAssociation'; } with draft; }
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Definition **/DMO/FSA_C_RootTP**
+
+```
+define behavior for /DMO/FSA_C_RootTP alias Root
+...
+{
+  use association _Child { create; with draft; }
+  use function GetDefaultsForChild;
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Implementation **/DMO/FSA_BP_R_RootTP**
+
+```
+METHODS GetDefaultsForChild FOR READ
+  IMPORTING keys FOR FUNCTION Root~GetDefaultsForChild RESULT result.
+
+METHOD GetDefaultsForCreate.
+  result = VALUE #( FOR key IN keys
+                      ( %tky    = key-%tky
+                        %param  = VALUE #( StringProperty = 'Default Value for Child Create'
+                                          FieldWithPercent = '1.0' ) ) ).
+ENDMETHOD.
+```
+
+#### action/function
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/default_function_action.jpg" width="75%" height="75%" title="Default Values Function for Action" />
+
+In this example, the property `valid_to` in input parameter `/DMO/FSA_D_SelectInstanceP` will be prefilled with a date. This date will in turn be used as a filter for the value help of `Semantic Key`.
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/default_function_vh.jpg" width="75%" height="75%" title="Usage of Defaulted Value for Value Help" />
+
+Further rules:
+- The action/function must specify an input parameter. Flat, deep, and deep table parameters are supported.
+- External name is possible
+
+> [!NOTE] 
+> Source: Behaviour Definition **/DMO/FSA_R_RootTP**
+
+```
+define behavior for /DMO/FSA_R_RootTP alias Root
+...
+{
+  // Search Term #DefaultFunctionForAction
+  action ( features : instance ) selectInstance parameter /DMO/FSA_D_SelectInstanceP { default function GetDefaultsForSelectInstance; }
+
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Definition **/DMO/FSA_C_RootTP**
+
+```
+define behavior for /DMO/FSA_C_RootTP alias Root
+...
+{
+  use action selectInstance;
+  use function GetDefaultsForSelectInstance;
+}
+```
+
+> [!NOTE] 
+> Source: Abstract Entity **/DMO/FSA_D_SelectInstanceP**
+
+```
+// Search Term #DefaultFunctionForAction
+define abstract entity /DMO/FSA_D_SelectInstanceP
+{
+  @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_RootVH' , element: 'StringProperty' },
+                                       additionalBinding: [{ element: 'ValidTo',
+                                                             localElement: 'valid_to',
+                                                             usage: #FILTER }] }]
+  @EndUserText.label: 'Semantic Key'
+  string_property : abap.char(256)  ;
+  
+  @EndUserText.label: 'Valid To'
+  valid_to: abap.dats;
+}
+```
+
+> [!NOTE] 
+> Source: Behaviour Implementation **/DMO/FSA_BP_R_RootTP**
+
+```
+METHODS GetDefaultsForSelectInstance FOR READ
+  IMPORTING keys FOR FUNCTION Root~GetDefaultsForSelectInstance RESULT result.
+
+METHOD GetDefaultsForSelectInstance.
+  DATA: lv_validto TYPE d.
+
+  SELECT SINGLE validto
+      FROM /DMO/FSA_RootVH
+      WHERE validto IS NOT INITIAL
+      INTO @DATA(lv_validto).
+
+    result = VALUE #( FOR key IN keys
+                      ( %tky    = key-%tky
+                        %param  = VALUE #( valid_to = lv_validto ) ) ).
+ENDMETHOD.
+```
+
+More information: [ABAP RESTful Application Programming Model - Operation Defaulting](https://help.sap.com/docs/abap-cloud/abap-rap/operation-defaulting)
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
 ## Recommended Data Types
 
 *Search term:* `#RecommendedDataTypesSection`
@@ -1078,6 +1280,23 @@ The file will be exported to your Downloads folder for both Windows and MacOS.
 
 ---
 
+## Export Treeview to PDF
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/export_treeview.jpg" title="Export Treeview" width="50%" height="50%"/>
+
+It is possible to download a treeview in the format PDF/A without any additional configuration. Take note that not all data types are supported, i.e. Stream properties are ignored.
+
+To control which columns are to be exported, first adjust your treeview settings and select the columns to be shown. Then click the Dropdown button, which is next to the Export File button and choose `Export As...`, or use the shortcut key Ctrl+Shift+E. Select the format `Portable Document Format (*.pdf)` in the popup box and additional settings will appear. Click the `Export` button to start your download.
+
+The file will be exported to your Downloads folder for both Windows and MacOS.
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
 ## Leading Entity
 
 *Search term:* `#LeadingEntity`
@@ -1097,6 +1316,168 @@ In a service definition, it is possible to annotate the leading entity of a serv
 define service /DMO/UI_FeatureShowcaseApp {
 ...
 ```
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
+## AdaptationHidden
+
+*Search term:* `UI.adaptationHidden`
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+> [!IMPORTANT]
+> UI Adaptation is only possible with deployed apps. Therefore some features of this annotation cannot be showcased in the Feature Showcase App app preview, unless stated otherwise.
+
+UI adaptation is a feature of SAPUI5 flexibility that allows key users without technical knowledge to easily make UI changes for all users of an app, end users to personalize controls, and developers to extend the UIs of SAPUI5 applications. For more information, see [SAPUI5 Flexibility: Adapting UIs Made Easy](https://sapui5.hana.ondemand.com/sdk/#/topic/a8e55aa2f8bc4127923b20685a6d1621.html).
+
+But there are some scenarios where you do not want to allow this, that a specific property or entity should **only** adher to the metadata or annotations. It is possible to do this, by using the annotation `@UI.adaptationHidden: true`. 
+
+### Only Applicable for Deployed Apps
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/adaptation_hidden.jpg" title="Property not Editable for UI Adaptation" />
+
+As a result, the property `Description` cannot
+- be removed or added in, in the object page
+- have its label/description be edited
+- have its position on the object page be changed via drag-and-drop
+
+### Visible Also in App Preview
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/adaptation_hidden_filter.jpg" title="Adaptation Hidden for Filter" width="50%" height="50%"/>
+
+In addition to the above, the property `Description` cannot
+- be added in as a list report filter
+
+> [!NOTE] 
+> Source: Metadata Extension **/DMO/FSA_C_RootTP**
+
+```
+annotate entity /DMO/FSA_C_RootTP with
+{
+  @UI.adaptationHidden: true
+  Description;
+}
+```
+
+More Information: [SAP Fiori Launchpad - Making UI Adaptations](https://help.sap.com/docs/UI_ADD-ON_FOR_SAP_NETWEAVER_20/17ae0e97e0fc424a9c368f350c0ba6bd/54270a390b194c3e97be2424592c3352.html)
+
+:arrow_up_small: [Back to Content](#content)
+
+---
+
+## CDS Simple Type
+
+*Search term:* `#SimpleType`
+
+> [!WARNING]  
+> Only available with the latest [SAP BTP or SAP S/4HANA Cloud, public edition release](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/tree/ABAP-platform-cloud).
+
+> Simple types allow the definition of user-defined scalar types together with (arbitrary) domain-specific metadata via CDS annotations.
+
+Simpler put, you can create user-defined data types in ABAP CDS, which work similarly to Data Elements in DDIC. The advantages of CDS simple types are:
+- you can type them to build-in data types like `abap.int4`, DDIC data elements, or even other CDS simple types
+- you can use a fixed list of CDS annotations to enrich the metadata of these data types, including but not limited to: `EndUserText`, `Semantics`, and others
+
+> [!TIP]
+> To get the full list of allowed annotations in simple type, simply use Code Completion in ADT with Ctrl + Space after typing `@`
+
+These data types can be used in CDS views by view parameters directly, or by properties via casting, and also directly by parameters in abstract entities. You can also use them in your ABAP code, especially when you are developing the behaviour implementation of RAP business objects.
+
+> [!WARNING]
+> Do not use CDS Simple Type with enumeration as it is **not** supported in RAP. 
+> CDS Simple Type is **not** supported in classic DDIC like tables and structures
+
+### Creating Simple Type
+
+> [!NOTE] 
+> Source: Type **/DMO/FSA_BT_Integer**
+
+```
+@EndUserText.label: 'Integer Value(from Simple Type)'
+@EndUserText.quickinfo: 'Integer Value'
+@EndUserText.heading: 'Integer'
+
+// Search Term #SimpleType
+
+define type /DMO/FSA_BT_Integer: abap.int4
+```
+
+The simple type `/DMO/FSA_BT_Integer` is typed to a build-in data type and enriched with `@EndUserText` annotations.
+
+> [!NOTE] 
+> Source: Type **/DMO/FSA_BT_ProgressInteger**
+
+```
+@EndUserText.label: 'Progress Integer Value(from Simple Type)'
+@EndUserText.quickinfo: 'Progress Integer Value'
+@EndUserText.heading: 'Progress Integer'
+
+// Search Term #SimpleType
+
+define type /DMO/FSA_BT_ProgressInteger: /DMO/FSA_BT_Integer
+```
+
+> [!NOTE] 
+> Source: Type **/DMO/FSA_BT_RadialInteger**
+
+```
+@EndUserText.label: 'Radial Integer Value(from Simple Type)'
+@EndUserText.quickinfo: 'Radial Integer Value'
+@EndUserText.heading: 'Radial Integer'
+
+// Search Term #SimpleType
+
+define type /DMO/FSA_BT_RadialInteger: /DMO/FSA_BT_Integer
+```
+
+The simple types `/DMO/FSA_BT_ProgressInteger` and `/DMO/FSA_BT_RadialInteger` are typed to another simple type, otherwise known as stacking. The types will also inherit the annotations of the base type, or they can be overwritten, as is the case here.
+
+### Using Simple Type
+
+<img src="https://raw.githubusercontent.com/SAP-samples/abap-platform-fiori-feature-showcase/main/Images/Guide/simple_type_label.jpg" title="CDS Simple Types Label in UI" />
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_I_Root**
+
+```
+define view entity /DMO/FSA_I_Root...
+{
+  ...
+  cast ( integer_value as /DMO/FSA_BT_Integer preserving type ) as IntegerValue, // Search Term #SimpleType
+}
+```
+
+> [!NOTE] 
+> Source: CDS View **/DMO/FSA_R_RootTP**
+
+```
+define root view entity /DMO/FSA_R_RootTP...
+{
+  ...
+  cast ( IntegerValue as /DMO/FSA_BT_RadialInteger preserving type )   as RadialIntegerValue, // Search Term #SimpleType
+  cast ( IntegerValue as /DMO/FSA_BT_ProgressInteger preserving type ) as ProgressIntegerValue, // Search Term #SimpleType
+}
+```
+
+> [!NOTE] 
+> Source: Abstract Entity **/DMO/FSA_D_ChangeProgressP**
+
+```
+define abstract entity /DMO/FSA_D_ChangeProgressP
+{
+  progress : /DMO/FSA_BT_ProgressInteger; // Search Term #SimpleType
+}
+```
+
+All types are now used in CDS views and abstract entity and will inherit the text annotations from the simple type definition, which will be shown in UI.
+
+More Information: 
+- [ABAP Data Models - Simple Types](https://help.sap.com/docs/abap-cloud/abap-data-models/simple-types)
+- [ABAP CDS Releases CDS-Native Data Types: CDS Simple Types](https://community.sap.com/t5/application-development-blog-posts/abap-cds-releases-cds-native-data-types-cds-simple-types/ba-p/13554393)
+- [ABAP Cloud: CDS Simple Types](https://www.youtube.com/watch?v=sv-X4ARUVIE)
 
 :arrow_up_small: [Back to Content](#content)
 
