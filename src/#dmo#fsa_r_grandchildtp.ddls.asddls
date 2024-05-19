@@ -9,7 +9,6 @@ define view entity /DMO/FSA_R_GrandchildTP
       ParentID,
       RootID,
       StringProperty,
-      GrandchildPieces,
       _Child,
       _Root
 }

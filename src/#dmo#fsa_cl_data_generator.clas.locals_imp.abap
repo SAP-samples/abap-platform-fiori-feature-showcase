@@ -26,6 +26,9 @@ CLASS lcl_abstract DEFINITION ABSTRACT.
       go_rnd TYPE REF TO cl_abap_random_float.
 
     CLASS-METHODS:
+      get_char_uuid
+        RETURNING
+          VALUE(rv_uuid)            TYPE sysuuid_c22,
       get_uuid
         RETURNING
           VALUE(rv_uuid)            TYPE sysuuid_x16,
@@ -35,6 +38,9 @@ CLASS lcl_abstract DEFINITION ABSTRACT.
         RETURNING
           VALUE(rv_string)          TYPE string,
       get_name
+        RETURNING
+          VALUE(rv_name)            TYPE string,
+      get_folder_name
         RETURNING
           VALUE(rv_name)            TYPE string,
       get_email
@@ -72,6 +78,9 @@ CLASS lcl_abstract DEFINITION ABSTRACT.
       get_percent
         RETURNING
           VALUE(rv_percent)         TYPE /dmo/fsa_child_a-field_with_percent,
+      get_size
+        RETURNING
+          VALUE(rv_size)            TYPE /dmo/fsa_fldr_a-folder_size,
       get_boolean
         RETURNING
           VALUE(rv_boolean)         TYPE abap_boolean,
@@ -94,6 +103,14 @@ CLASS lcl_abstract IMPLEMENTATION.
 
   METHOD class_constructor.
     go_rnd = cl_abap_random_float=>create( CONV i( cl_abap_context_info=>get_system_time( ) ) ).
+  ENDMETHOD.
+
+  METHOD get_char_uuid.
+    TRY.
+        rv_uuid = cl_system_uuid=>create_uuid_c22_static( ).
+      CATCH cx_uuid_error INTO DATA(lx).
+        RAISE SHORTDUMP lx.
+    ENDTRY.
   ENDMETHOD.
 
   METHOD get_uuid.
@@ -239,6 +256,20 @@ CLASS lcl_abstract IMPLEMENTATION.
 
   METHOD get_field_with_quantity.
     rv_dec = go_rnd->get_next( ) * 10000 .
+  ENDMETHOD.
+
+  METHOD get_folder_name.
+    DATA lt_colour TYPE STANDARD TABLE OF string.
+
+    lt_colour = VALUE #( ##NO_TEXT
+                  ( `Red` )
+                  ( `Green` )
+                  ( `Blue` )
+                  ( `Beige` )
+                  ( `Orange` )
+                ).
+
+    rv_name = lt_colour[ floor( lines( lt_colour ) * go_rnd->get_next( ) ) + 1 ].
   ENDMETHOD.
 
   METHOD get_name.
@@ -451,6 +482,10 @@ CLASS lcl_abstract IMPLEMENTATION.
     IF rv_percent > '100.00'.
       rv_percent = '99.99'.
     ENDIF.
+  ENDMETHOD.
+
+  METHOD get_size.
+    rv_size = go_rnd->get_next( ) * 1000.
   ENDMETHOD.
 
   METHOD get_boolean.
@@ -981,6 +1016,94 @@ CLASS lcl_fsa_grandchild IMPLEMENTATION.
           ) TO gt_grandchild.
       ENDDO.
     ENDLOOP.
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+
+
+CLASS lcl_fsa_folder DEFINITION CREATE PUBLIC INHERITING FROM lcl_abstract.
+
+  PUBLIC SECTION.
+    TYPES:
+     tt_folder TYPE STANDARD TABLE OF /dmo/fsa_fldr_a WITH KEY folder_id root_id.
+
+    CLASS-METHODS:
+      generate
+        RETURNING
+          VALUE(rt_folder) TYPE tt_folder,
+      get
+        IMPORTING is_folder TYPE /dmo/fsa_fldr_a
+                  it_folder TYPE tt_folder
+        RETURNING
+          VALUE(rs_folder) TYPE /dmo/fsa_fldr_a.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+    CLASS-DATA:
+      gt_folder TYPE tt_folder.
+
+    CLASS-METHODS:
+      _generate.
+
+ENDCLASS.
+
+CLASS lcl_fsa_folder IMPLEMENTATION.
+
+  METHOD generate.
+    IF gt_folder IS INITIAL.
+      _generate( ).
+    ENDIF.
+
+    rt_folder = gt_folder.
+  ENDMETHOD.
+
+  METHOD _generate.
+    DATA: lt_folder TYPE tt_folder,
+          lt_parent TYPE tt_folder.
+
+    LOOP AT lcl_fsa_root=>generate( ) INTO DATA(ls_root).
+      DATA(lv_count) = 0.
+
+      DO get_int4( min = 10  max = 30 ) TIMES.
+        lv_count += 1.
+        APPEND VALUE /dmo/fsa_fldr_a(
+            root_id     = ls_root-id
+            folder_id   = get_char_uuid( )
+            folder_name = |{ get_folder_name( ) } { lv_count }|
+            folder_size = get_size( )
+          ) TO lt_folder.
+      ENDDO.
+
+      LOOP AT lt_folder ASSIGNING FIELD-SYMBOL(<fs_folder>).
+        IF sy-tabix = 1.
+          APPEND <fs_folder> TO lt_parent.
+          CONTINUE.
+        ENDIF.
+
+        <fs_folder>-parent_folder = get( is_folder = <fs_folder>
+                                         it_folder = lt_parent )-folder_id.
+
+        APPEND <fs_folder> TO lt_parent.
+      ENDLOOP.
+
+      APPEND LINES OF lt_folder TO gt_folder.
+
+      CLEAR: lt_folder, lt_parent.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD get.
+    DATA(lt_folder) = it_folder.
+    DELETE lt_folder WHERE folder_id = is_folder-folder_id.
+
+    rs_folder = lt_folder[ floor( lines( lt_folder ) * go_rnd->get_next( ) ) + 1 ].
   ENDMETHOD.
 
 ENDCLASS.

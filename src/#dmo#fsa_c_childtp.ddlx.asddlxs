@@ -57,12 +57,6 @@ annotate entity /DMO/FSA_C_ChildTP
       id: 'Collection',
       label: 'Child Data'
     },
-//    { 
-//      purpose: #STANDARD,
-//      type: #FIELDGROUP_REFERENCE,
-//      targetQualifier: 'RootData',
-//      label: 'Root Data'
-//    },
     { 
       purpose: #STANDARD,
       type: #DATAPOINT_REFERENCE,
@@ -115,9 +109,10 @@ annotate entity /DMO/FSA_C_ChildTP
       }
     ], 
     dataPoint: { 
-      criticality: 'CriticalityCode',
-      criticalityRepresentation: #WITHOUT_ICON,
-      title: 'String Property' 
+//      criticality: 'CriticalityCode',
+//      criticalityRepresentation: #WITHOUT_ICON,
+      title: 'String Property',
+      qualifier: 'StringProperty'
     }
   }
   StringProperty;
@@ -131,7 +126,8 @@ annotate entity /DMO/FSA_C_ChildTP
     ], // Search Term #OPTable
     dataPoint: { 
       title: 'Percentage property',
-      visualization: #NUMBER
+      visualization: #NUMBER,
+      qualifier: 'FieldWithPercent'
     }
   } 
   @EndUserText.quickInfo: 'Change value to trigger validation - side effect'
@@ -140,8 +136,10 @@ annotate entity /DMO/FSA_C_ChildTP
   @UI: { 
     dataPoint: { 
       title: 'Criticality',
+      qualifier: 'CriticalityCode',
       criticality: 'CriticalityCode'
-    }
+    },
+    lineItem: [{ importance: #LOW }]
   } 
   CriticalityCode;
 
@@ -158,27 +156,83 @@ annotate entity /DMO/FSA_C_ChildTP
   @EndUserText.quickInfo: 'Check/Uncheck to enable/disable Delete button - side effect'
   BooleanProperty;
   
+  // Search Term #StreamDynamicFeatureCtrl
+  @UI: {
+    lineItem: [
+      { 
+        position: 50, 
+        label: 'Stream readonly? (#StreamDynFeatureCtrl)' 
+      }
+    ], 
+    fieldGroup: [
+      { 
+        position: 10, 
+        qualifier: 'Stream', 
+        label: 'Stream readonly? (#StreamDynFeatureCtrl)' 
+      }
+    ]
+  }
+  @EndUserText: { 
+    label: 'Stream readonly? Caution - cannot be changed after create',
+    quickInfo: 'Stream readonly?'
+  }
+  StreamIsReadOnly;
+  
   // Search Term #Stream
   @UI.hidden: true
   StreamMimeType;
   
   @UI: {
-    lineItem: [{ position: 50, label: 'Attachment (#StreamTable)' }], // Search Term #StreamTable
-    fieldGroup: [{ position: 10, qualifier: 'Stream', label: 'Attachment (#Stream)' }] // Search Term #Stream
+    // Search Term #StreamTable
+    lineItem: [
+      { 
+        position: 60, 
+        label: 'Attachment (#StreamTable)' 
+      }
+    ],
+    // Search Term #Stream
+    fieldGroup: [
+      {
+        position: 10, 
+        qualifier: 'Stream', 
+        label: 'Attachment (#Stream)' 
+      }
+    ] 
   }
   StreamFile;
+  
+  // Search Term #StreamStaticFeatureCtrl
+  @UI: {
+    lineItem: [
+      { 
+        position: 70, 
+        label: 'Attachment (#StreamStaticFeatureCtrl)' 
+      }
+    ],
+    fieldGroup: [
+      { 
+        position: 30, 
+        qualifier: 'Stream', 
+        label: 'Attachment (#StreamStaticFeatureCtrl)' 
+      }
+    ]
+  }
+  StreamFileReadonly;
   
   // Search Term #Stream
   @UI.hidden: true
   StreamFilename;
   
+  // Search Term #SideEffects
   @UI: {
-    lineItem: [{ position: 40, label: 'Child Pieces (#SideEffects)' }] // Search Term #SideEffects
+    lineItem: [
+      { 
+        position: 40, 
+        label: 'Child Pieces (#SideEffects)' 
+      }
+    ] 
   }
   @EndUserText.quickInfo: 'Change value to trigger Total recalculation at Root - side effect'
   ChildPieces;
   
-//  // Search Term #SideEffects ( target path more than one association )
-//  @UI.fieldGroup: [{ qualifier: 'RootData' }]
-//  TotalGrandchildPieces;
 }

@@ -3,8 +3,7 @@
 {
 "FROM":
 [
-"/DMO/FSA_R_CHILDTP",
-"/DMO/FSA_R_ROOTTP"
+"/DMO/FSA_R_CHILDTP"
 ],
 "ASSOCIATED":
 [

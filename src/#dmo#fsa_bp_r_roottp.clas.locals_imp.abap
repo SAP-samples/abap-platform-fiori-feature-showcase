@@ -1,47 +1,3 @@
-CLASS lhc_grandchild DEFINITION INHERITING FROM cl_abap_behavior_handler.
-
-  PRIVATE SECTION.
-
-    METHODS calculategrandchildpieces FOR DETERMINE ON MODIFY
-      IMPORTING keys FOR grandchild~calculategrandchildpieces.
-
-ENDCLASS.
-
-CLASS lhc_grandchild IMPLEMENTATION.
-
-  METHOD calculateGrandchildPieces.
-    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
-      ENTITY Grandchild
-        FIELDS ( RootID GrandchildPieces )
-        WITH CORRESPONDING #( keys )
-      RESULT DATA(grandchildren)
-      ENTITY Grandchild BY \_Root
-        FIELDS ( TotalGrandchildPieces )
-        WITH CORRESPONDING #( keys )
-      RESULT DATA(roots).
-
-    LOOP AT roots ASSIGNING FIELD-SYMBOL(<fs_root>).
-      DATA(lv_value) = VALUE #( grandchildren[ RootID = <fs_root>-id ]-GrandchildPieces OPTIONAL ).
-
-      IF lv_value IS NOT INITIAL.
-        <fs_root>-TotalGrandchildPieces += lv_value.
-      ENDIF.
-    ENDLOOP.
-
-    MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
-      ENTITY Root
-        UPDATE
-          FIELDS ( TotalGrandchildPieces )
-          WITH VALUE #( FOR root IN roots
-                          ( %tky                  = root-%tky
-                            TotalGrandchildPieces       = root-TotalGrandchildPieces ) )
-      REPORTED DATA(mod_reported).
-
-    reported = CORRESPONDING #( DEEP mod_reported ).
-  ENDMETHOD.
-
-ENDCLASS.
-
 CLASS lhc_child DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
   PRIVATE SECTION.
@@ -51,6 +7,8 @@ CLASS lhc_child DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS get_instance_features FOR INSTANCE FEATURES
       IMPORTING keys REQUEST requested_features FOR Child RESULT result.
+    METHODS copytoreadonlystream FOR DETERMINE ON MODIFY
+      IMPORTING keys FOR child~copytoreadonlystream.
 
 ENDCLASS.
 
@@ -71,25 +29,68 @@ CLASS lhc_child IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_instance_features.
+    DATA lt_result LIKE result.
+
     READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Child BY \_Root
+        FIELDS ( DisableChildOperation )
+        WITH CORRESPONDING #( keys )
+      RESULT DATA(roots)
       ENTITY Child
-        FIELDS ( BooleanProperty )
+        FIELDS ( ParentID BooleanProperty StreamIsReadOnly )
         WITH CORRESPONDING #(  keys  )
       RESULT DATA(children).
 
-    result = VALUE #( FOR child IN children
-                        ( %tky      = child-%tky
-                          %delete   = COND #( WHEN child-BooleanProperty  = abap_true
-                                                THEN if_abap_behv=>fc-o-enabled
-                                                ELSE if_abap_behv=>fc-o-disabled  )
+    LOOP AT roots ASSIGNING FIELD-SYMBOL(<fs_root>).
+      lt_result = VALUE #( FOR child IN children WHERE ( ParentID = <fs_root>-id )
+                        ( %tky              = child-%tky
+                          %field-StreamFile = COND #( WHEN child-StreamIsReadOnly  = abap_true
+                                                        THEN if_abap_behv=>fc-f-read_only
+                                                        ELSE if_abap_behv=>fc-f-unrestricted  )
+                          %delete           = COND #( WHEN child-BooleanProperty  = abap_true
+                                                        THEN if_abap_behv=>fc-o-enabled
+                                                        ELSE if_abap_behv=>fc-o-disabled  )
+                          %update           = COND #( WHEN <fs_root>-DisableChildOperation = abap_true
+                                                        THEN if_abap_behv=>fc-o-disabled
+                                                        ELSE if_abap_behv=>fc-o-enabled  )
                          ) ).
+
+      APPEND LINES OF lt_result TO result.
+      CLEAR lt_result.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD copyToReadOnlyStream.
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Child
+        FIELDS ( StreamFile )
+        WITH CORRESPONDING #( keys )
+      RESULT DATA(children).
+
+    MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Child
+        UPDATE
+          FIELDS ( StreamFileReadonly )
+          WITH VALUE #( FOR child IN children
+                          ( %tky                        = child-%tky
+                            StreamFileReadonly          = child-StreamFile
+                            %control-StreamFileReadonly = if_abap_behv=>mk-on ) )
+      FAILED DATA(upd_failed)
+      REPORTED DATA(upd_reported).
+
+    reported = CORRESPONDING #( DEEP upd_reported ).
   ENDMETHOD.
 
 ENDCLASS.
 
 CLASS lhc_Root DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
-    TYPES: tt_criticality TYPE STANDARD TABLE OF /dmo/fsa_critlty WITH DEFAULT KEY.
+    TYPES: tt_criticality     TYPE STANDARD TABLE OF /dmo/fsa_critlty WITH DEFAULT KEY,
+           tt_entities_create TYPE TABLE FOR CREATE /dmo/fsa_r_roottp\\root,
+           tt_entities_update TYPE TABLE FOR UPDATE /dmo/fsa_r_roottp\\root,
+           tt_failed_root     TYPE TABLE FOR FAILED   EARLY /dmo/fsa_r_roottp\\root,
+           tt_reported_root   TYPE TABLE FOR REPORTED EARLY /dmo/fsa_r_roottp\\root.
 
     METHODS get_instance_authorizations FOR INSTANCE AUTHORIZATION
       IMPORTING keys REQUEST requested_authorizations FOR Root RESULT result.
@@ -135,8 +136,23 @@ CLASS lhc_Root DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS overwriteTimezone FOR MODIFY
       IMPORTING keys FOR ACTION Root~overwriteTimezone.
+
     METHODS validateTimezone FOR VALIDATE ON SAVE
       IMPORTING keys FOR Root~validateTimezone.
+
+    METHODS GetDefaultsForCreate FOR READ
+      IMPORTING keys FOR FUNCTION Root~GetDefaultsForCreate RESULT result.
+
+    METHODS GetDefaultsForChild FOR READ
+      IMPORTING keys FOR FUNCTION Root~GetDefaultsForChild RESULT result.
+
+    METHODS selectInstance FOR MODIFY
+      IMPORTING keys FOR ACTION Root~selectInstance.
+
+    METHODS GetDefaultsForSelectInstance FOR READ
+      IMPORTING keys FOR FUNCTION Root~GetDefaultsForSelectInstance RESULT result.
+    METHODS updateTimesChildCreated FOR DETERMINE ON SAVE
+      IMPORTING keys FOR Root~updateTimesChildCreated.
 
 ENDCLASS.
 
@@ -290,6 +306,9 @@ CLASS lhc_Root IMPLEMENTATION.
                                                                       THEN if_abap_behv=>fc-o-disabled
                                                                       ELSE if_abap_behv=>fc-o-enabled )
                           %action-copyInstance            = COND #( WHEN root-UpdateHidden  = abap_true
+                                                                      THEN if_abap_behv=>fc-o-disabled
+                                                                      ELSE if_abap_behv=>fc-o-enabled )
+                          %action-selectInstance          = COND #( WHEN root-UpdateHidden  = abap_true
                                                                       THEN if_abap_behv=>fc-o-disabled
                                                                       ELSE if_abap_behv=>fc-o-enabled )
                           %action-resetTimesChildCreated  = COND #( WHEN root-UpdateHidden  = abap_true OR root-TimesChildCreated = 0
@@ -573,6 +592,58 @@ CLASS lhc_Root IMPLEMENTATION.
       ENDIF.
 
     ENDLOOP.
+  ENDMETHOD.
+
+  METHOD GetDefaultsForCreate.
+    result = VALUE #( FOR key IN keys
+                      ( %cid    = key-%cid
+                        %param  = VALUE #( StringProperty = 'Default Value for Root Create' ) ) ).
+  ENDMETHOD.
+
+  METHOD GetDefaultsForChild.
+    result = VALUE #( FOR key IN keys
+                      ( %tky    = key-%tky
+                        %param  = VALUE #( StringProperty = 'Default Value for Child Create'
+                                          FieldWithPercent = '1.0' ) ) ).
+  ENDMETHOD.
+
+  METHOD selectInstance.
+  ENDMETHOD.
+
+  METHOD GetDefaultsForSelectInstance.
+
+    SELECT SINGLE validto
+      FROM /DMO/FSA_RootVH
+      WHERE validto IS NOT INITIAL
+      INTO @DATA(lv_validto).
+
+    result = VALUE #( FOR key IN keys
+                      ( %tky    = key-%tky
+                        %param  = VALUE #( valid_to = lv_validto ) ) ).
+
+  ENDMETHOD.
+
+  METHOD updateTimesChildCreated.
+
+    READ ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root BY \_Child
+        FIELDS ( ChildPieces ParentID ) WITH CORRESPONDING #( keys )
+      RESULT DATA(children).
+
+    MODIFY ENTITIES OF /DMO/FSA_R_RootTP IN LOCAL MODE
+      ENTITY Root
+        UPDATE
+          FIELDS ( TotalPieces )
+          WITH VALUE #( FOR key IN keys
+                          ( %tky                 = key-%tky
+                            TotalPieces          = REDUCE i( INIT val TYPE i
+                                                             FOR child IN children WHERE ( ParentID = key-id )
+                                                             NEXT val += child-ChildPieces )
+                            %control-TotalPieces = if_abap_behv=>mk-on ) )
+      FAILED DATA(upd_failed)
+      REPORTED DATA(upd_reported).
+
+    reported = CORRESPONDING #( DEEP upd_reported ).
   ENDMETHOD.
 
 ENDCLASS.

@@ -2,7 +2,7 @@
 @EndUserText.label: 'Root TP'
 @Metadata.allowExtensions: true
 
-@Search.searchable: true 
+@Search.searchable: true
 @ObjectModel.semanticKey: ['StringProperty']
 
 define root view entity /DMO/FSA_C_RootTP
@@ -10,13 +10,13 @@ define root view entity /DMO/FSA_C_RootTP
   as projection on /DMO/FSA_R_RootTP
 {
   key ID,
-  
+
       @Search: { defaultSearchElement: true, fuzzinessThreshold: 0.9 }
       StringProperty,
-      
-      @Search: { defaultSearchElement: true, fuzzinessThreshold: 0.7 } 
+
+      @Search: { defaultSearchElement: true, fuzzinessThreshold: 0.7 }
       FieldWithPrice,
-      
+
       ImageUrl,
       IntegerValue,
       ProgressIntegerValue,
@@ -36,6 +36,7 @@ define root view entity /DMO/FSA_C_RootTP
       FieldWithCriticality,
       HarveyFieldWithPrice,
       CriticalityNullValInd,
+      DisableChildOperation,
       DeleteHidden,
       UpdateHidden,
       FieldWithUrl,
@@ -78,7 +79,7 @@ define root view entity /DMO/FSA_C_RootTP
       TypeNumc,
       TypeQuan,
       TypeFltpQuan,
-      
+
       @Semantics.largeObject: {
         acceptableMimeTypes: [ 'image/*', 'application/*' ],
         cacheControl.maxAge: #MEDIUM,
@@ -88,7 +89,7 @@ define root view entity /DMO/FSA_C_RootTP
         mimeType: 'StreamMimeType'
       }
       TypeRawstring,
-      
+
       TypeSstring,
       TypeString,
       TypeTimn,
@@ -101,10 +102,11 @@ define root view entity /DMO/FSA_C_RootTP
       TypeCuky,
       TypeLang,
       TypeUnit,
-      
+
       /* Associations */
-      _Chart : redirected to composition child /DMO/FSA_C_ChartTP,
-      _Child : redirected to composition child /DMO/FSA_C_ChildTP,
+      _Chart  : redirected to composition child /DMO/FSA_C_ChartTP,
+      _Child  : redirected to composition child /DMO/FSA_C_ChildTP,
+      _Folder,
       _Language,
       _Contact,
       _Country,

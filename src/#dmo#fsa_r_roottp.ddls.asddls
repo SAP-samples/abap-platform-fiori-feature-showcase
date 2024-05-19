@@ -6,27 +6,47 @@
 
 define root view entity /DMO/FSA_R_RootTP
   as select from /DMO/FSA_I_Root
-  composition [0..*] of /DMO/FSA_R_ChildTP as _Child
-  composition [0..*] of /DMO/FSA_R_ChartTP as _Chart
+  composition [0..*] of /DMO/FSA_R_ChildTP             as _Child
+  composition [0..*] of /DMO/FSA_R_ChartTP             as _Chart
 {
   key ID,
       StringProperty,
       ImageUrl,
       IntegerValue,
-      IntegerValue   as RadialIntegerValue,
+      cast ( IntegerValue as /DMO/FSA_BT_RadialInteger preserving type )   as RadialIntegerValue, // Search Term #SimpleType
+      cast ( IntegerValue as /DMO/FSA_BT_ProgressInteger preserving type ) as ProgressIntegerValue, // Search Term #SimpleType
       ForecastValue,
       TargetValue,
-      Dimensions, 
-      
-      @EndUserText.label: 'Progress Indicator'
-      IntegerValue   as ProgressIntegerValue,
-
-      @EndUserText.label: 'Rating Indicator'
+      Dimensions,
       StarsValue,
+      FieldWithQuantity,
+      FieldWithCriticality,
+      FieldWithPrice,
+      FieldWithPrice                                                       as HarveyFieldWithPrice,
+      CriticalityNullValInd,
+      DeleteHidden,
+      UpdateHidden,
+      DisableChildOperation,
+      FieldWithUrl,
+      FieldWithUrlText,
+      Email,
+      Telephone,
+      ValidFrom,
+      ValidTo,
+      Time,
+      Description,
+      DescriptionCustomGrowing,
+      TimesChildCreated,
+      TotalPieces,
+      TotalGrandchildPieces,
+      CreatedBy,
+      CreatedAt,
+      LocalLastChangedBy,
+      LocalLastChangedAt,
+      LastChangedAt,
 
-      // Search Term #ValueHelps BEGIN
-
-      // Search Term #DependentFilter 
+      // Search Term #ValueHelps
+      // Search Term #DependentFilter
       @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_I_Contact' , element: 'ID' },
                                            label: 'Contacts',
                                            additionalBinding: [{ element: 'Country',
@@ -44,67 +64,41 @@ define root view entity /DMO/FSA_R_RootTP
                                             }]
       Uom,
 
-      FieldWithQuantity,
-
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_CurrencyStdVH', element: 'Currency' }}]
       IsoCurrency,
 
-      // Search Term #CollectiveValueHelp 
+      // Search Term #CollectiveValueHelp
       @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_D_CountryCVH',  element: 'Country'  },
-                                           additionalBinding: [{ element: 'Region', 
+                                           additionalBinding: [{ element: 'Region',
                                                                  localElement: 'Region' }]  }]
       Country,
 
-      // Search Term #useForValidationVH 
-      @EndUserText.label: 'Region (#useForValidationVH):'
+      // Search Term #useForValidationVH
+      @EndUserText.label: 'Region (#useForValidationVH)'
       @Consumption.valueHelpDefinition: [{  entity: { name: 'I_RegionVH', element: 'Region' },
-                                            qualifier: 'RegionValueHelp', 
-                                            useForValidation: true, 
+                                            qualifier: 'RegionValueHelp',
+                                            useForValidation: true,
                                             additionalBinding: [{ element: 'Country',
                                                                   localElement: 'Country' }] }]
       Region,
 
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_I_Navigation', element: 'ID' } }] 
+      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/FSA_I_Navigation', element: 'ID' } }]
       NavigationID,
-      // Search Term #ValueHelps END
+      // END Search Term #ValueHelps
 
-      FieldWithCriticality,
-      FieldWithPrice,
-      FieldWithPrice as HarveyFieldWithPrice,
-      CriticalityNullValInd,
-      DeleteHidden,
-      UpdateHidden,
-      FieldWithUrl,
-      FieldWithUrlText,
-      Email,
-      Telephone,
-      ValidFrom,
-      ValidTo,
-      Time,
-      
       // Search Term #IANATimezone
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_TimeZone', element: 'TimeZoneID' } }]
       SAPTimezone,
-      
+
       @Semantics.timeZone: true
-      SAPTimezone as IANATimezone,
-      
+      SAPTimezone                                                          as IANATimezone,
+
       Timestamp,
-      
-      @Semantics.timeZoneReference: 'IANATimezone' 
-      Timestamp as IANATimestamp,
-      // End Search Term #IANATimezone
-      
-      Description,
-      DescriptionCustomGrowing,
-      TimesChildCreated,
-      TotalPieces,
-      TotalGrandchildPieces,
-      CreatedBy,
-      CreatedAt,
-      LocalLastChangedBy,
-      LocalLastChangedAt,
-      LastChangedAt,
+
+      @Semantics.timeZoneReference: 'IANATimezone'
+      Timestamp                                                            as IANATimestamp,
+      // END Search Term #IANATimezone
+
       TypeAccp,
       TypeBool,
       TypeChar,
@@ -134,22 +128,23 @@ define root view entity /DMO/FSA_R_RootTP
       TypeTzntstmpl,
       TypeDecTime,
       StreamMimeType,
-      
+
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_CurrencyStdVH', element: 'Currency' } }]
       TypeCuky,
-      
+
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_Language', element: 'Language' } }]
       TypeLang,
-      
+
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_UnitOfMeasureStdVH', element: 'UnitOfMeasure' } }]
       TypeUnit,
-      
+
       /* Associations */
       _Contact,
       _Country,
       _Criticality,
       _Currency,
       _Navigation,
+      _Folder,
       _Region,
       _UoM,
       _Child,

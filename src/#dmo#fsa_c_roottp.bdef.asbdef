@@ -6,6 +6,8 @@ use side effects;
 define behavior for /DMO/FSA_C_RootTP alias Root
 {
   use create;
+  use function GetDefaultsForCreate;
+
   use update;
   use delete;
 
@@ -16,8 +18,12 @@ define behavior for /DMO/FSA_C_RootTP alias Root
   use action increaseTimesChildCreated;
   use action overwriteTimezone;
 
+  use action selectInstance;
+  use function GetDefaultsForSelectInstance;
+
   use action validateDate;
   use action validateChild;
+  use action updateTimes;
 
   action ( features : instance ) createChildFromRoot result [0..1] entity /DMO/FSA_C_ChildTP;
 
@@ -28,7 +34,9 @@ define behavior for /DMO/FSA_C_RootTP alias Root
   use action Resume;
 
   use association _Chart { create; with draft; }
+
   use association _Child { create; with draft; }
+  use function GetDefaultsForChild;
 
   side effects {
     action createChildFromRoot affects entity _Child, field TimesChildCreated, permissions ( action resetTimesChildCreated );

@@ -19,10 +19,4 @@ annotate entity /DMO/FSA_C_GrandchildTP
   @UI.identification: [{ position: 10 }]
   StringProperty;
   
-//  // Search Term #SideEffects ( target path more than one association )
-//  @UI.lineItem: [{ 
-//    position: 20 
-//  }] 
-//  @UI.identification: [{ position: 20 }]
-//  GrandchildPieces;
 }

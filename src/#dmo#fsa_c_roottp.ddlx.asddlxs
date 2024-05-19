@@ -32,7 +32,7 @@
     ],
     visualizations: [{type: #AS_LINEITEM}]
   }
-] 
+]
 
 // Search Term #SelectionVariant
 @UI.selectionVariant: [
@@ -111,18 +111,17 @@ annotate entity /DMO/FSA_C_RootTP with
 {
   @UI.facet: [
     // ObjectPageHEADER
-    
     // Search Term #HeaderFacet, #KeyValue
     {
-      purpose: #HEADER,
-      type: #DATAPOINT_REFERENCE,
-      targetQualifier: 'fieldWithPrice'
+      purpose         : #HEADER,
+      type            : #DATAPOINT_REFERENCE,
+      targetQualifier : 'fieldWithPrice'
     },
     // Search Term #HeaderCollectionFacet
     {
-      purpose: #HEADER,
-      id: 'FacetCollection',
-      type: #COLLECTION
+      purpose : #HEADER,
+      id      : 'FacetCollection',
+      type    : #COLLECTION
     },
     // Search Term #HeaderFieldGroup
     {
@@ -139,49 +138,49 @@ annotate entity /DMO/FSA_C_RootTP with
     },
     // Search Term #HeaderCollectionFacet
     {
-      purpose: #HEADER,
-      type: #COLLECTION,
-      id: 'CollectionFacet1'
+      purpose : #HEADER,
+      type    : #COLLECTION,
+      id      : 'CollectionFacet1'
     },
     // Search Term #DataPointRating
     {
-      parentId   : 'CollectionFacet1',
-      type       : #DATAPOINT_REFERENCE,
-      targetQualifier: 'StarsValue'
+      parentId        : 'CollectionFacet1',
+      type            : #DATAPOINT_REFERENCE,
+      targetQualifier : 'StarsValue'
     },
     // Search Term #DataPointProgress
     {
-      parentId   : 'CollectionFacet1',
-      type       : #DATAPOINT_REFERENCE,
-      targetQualifier: 'ProgressIntegerValue'
+      parentId        : 'CollectionFacet1',
+      type            : #DATAPOINT_REFERENCE,
+      targetQualifier : 'ProgressIntegerValue'
     },
     // Search Term #AddressFacet
     {
-      parentId   : 'CollectionFacet1',
-      label: 'Address (#AddressFacet)',
-      type       : #ADDRESS_REFERENCE,
-      targetElement: '_Contact',
-      targetQualifier: 'pref',
-      purpose: #STANDARD
+      parentId        : 'CollectionFacet1',
+      label           : 'Address (#AddressFacet)',
+      type            : #ADDRESS_REFERENCE,
+      targetElement   : '_Contact',
+      targetQualifier : 'pref',
+      purpose         : #STANDARD
     },
     // Search Term #HeaderCollectionFacet
     {
-      purpose: #HEADER,
-      type: #COLLECTION,
-      id: 'CollectionFacet2'
+      purpose : #HEADER,
+      type    : #COLLECTION,
+      id      : 'CollectionFacet2'
     },
     // Search Term #AreaMicroChart
     {
-      parentId   : 'CollectionFacet2',
-      type       : #CHART_REFERENCE,
-      targetQualifier: 'areaChart',
-      targetElement: '_Chart'
+      parentId        : 'CollectionFacet2',
+      type            : #CHART_REFERENCE,
+      targetQualifier : 'areaChart',
+      targetElement   : '_Chart'
     },
     // Search Term #RadialMicroChart
     {
-      parentId   : 'CollectionFacet2',
-      type       : #CHART_REFERENCE,
-      targetQualifier: 'radialChart'
+      parentId        : 'CollectionFacet2',
+      type            : #CHART_REFERENCE,
+      targetQualifier : 'radialChart'
     },
     // Search Term #PlainText
     {
@@ -226,10 +225,11 @@ annotate entity /DMO/FSA_C_RootTP with
     },
 
     // ObjectPageSTANDARD
-    
+
     // Search Term #NestedTabs
-    { 
+    {
       purpose: #STANDARD,
+      position: 10,
       type: #COLLECTION,
       label: 'Nested Tabs (#NestedTabs)',
       id: 'Nested'
@@ -237,6 +237,7 @@ annotate entity /DMO/FSA_C_RootTP with
     // Search Term #OPSection
     {
       purpose: #STANDARD,
+      position: 10,
       type: #COLLECTION,
       label: 'Collection Facet (#OPSection)',
       id: 'collectionFacetSection',
@@ -263,9 +264,29 @@ annotate entity /DMO/FSA_C_RootTP with
       type       : #FIELDGROUP_REFERENCE,
       targetQualifier: 'communication'
     },
+    // Search Term #DatapointHidden
+    {
+      purpose: #STANDARD,
+      position: 20,
+      type: #COLLECTION,
+      label: 'Communication (#DatapointHidden)(Fields hidden when update not possible)',
+      id: 'datapointHidden',
+      parentId: 'Nested'
+    },
+    {
+      parentId: 'datapointHidden',
+      type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'Email'
+    },
+    {
+      parentId: 'datapointHidden',
+      type: #DATAPOINT_REFERENCE,
+      targetQualifier: 'Telephone'
+    },
     // Search Term #TimeAndDate
     {
       parentId   : 'Nested',
+      position   : 30,
       id         : 'TimeAndDate',
       label      : 'Time and Date (#TimeAndDate)',
       type       : #COLLECTION
@@ -292,6 +313,7 @@ annotate entity /DMO/FSA_C_RootTP with
     // Search Term #MicroChartDataSection
     {
       purpose: #STANDARD,
+      position: 40,
       type: #COLLECTION,
       label: 'Micro Chart Data(#MicroChartDataSection)',
       id: 'chartDataCollection',
@@ -315,6 +337,7 @@ annotate entity /DMO/FSA_C_RootTP with
     // Search Term #HidingContent
     {
       type: #FIELDGROUP_REFERENCE,
+      position: 20,
       label: 'Visible when in Edit(#HidingContent)',
       targetQualifier: 'ShowWhenInEdit',
       hidden: #( IsActiveEntity )
@@ -322,22 +345,17 @@ annotate entity /DMO/FSA_C_RootTP with
     // Search Term #OPTable, #PresentationVariant-Child
     {
       purpose: #STANDARD,
+      position: 30,
       type: #PRESENTATIONVARIANT_REFERENCE,
       targetElement: '_Child',
       targetQualifier: 'pVariant',
       label: 'Child Entity (1..n)(#OPTable)',
       id: 'childEntitiesSection'
     },
-//    // Test subitem lineitem facet
-//    {
-//      purpose: #STANDARD,
-//      type: #LINEITEM_REFERENCE,
-//      targetElement: '_Child._Grandchild',
-//      label: 'Grandchild'
-//    },
     // Search Term #SideEffectsSection
     {
       purpose: #STANDARD,
+      position: 40,
       type: #FIELDGROUP_REFERENCE,
       targetQualifier: 'SideEffects',
       label: 'Side Effects (#SideEffectsSection)'
@@ -345,15 +363,25 @@ annotate entity /DMO/FSA_C_RootTP with
     // Search Term #NavigationSection
     {
       purpose: #STANDARD,
+      position: 50,
       type: #FIELDGROUP_REFERENCE,
       targetElement: '_Navigation',
       targetQualifier: 'data',
       label: 'Navigation (1..1) (#NavigationSection)'
     },
+    // Search Term #RAPTreeviewSection
+    {
+      purpose:       #STANDARD,
+      position: 60,
+      type:          #LINEITEM_REFERENCE,
+      label:         'File Folder System (#RAPTreeviewSection)',
+      targetElement: '_Folder'
+    },
     // Search Term #RecommendedDataTypesSection
     {
       purpose: #STANDARD,
       type: #FIELDGROUP_REFERENCE,
+      position: 70,
       targetQualifier: 'DataTypes',
       label: 'Data Types(#RecommendedDataTypesSection)'
     },
@@ -380,7 +408,7 @@ annotate entity /DMO/FSA_C_RootTP with
       label: 'Location (#FilterGrouping)'
     }
   ]
-  
+
   @UI.identification: [
     // Search Term #OPHeaderAction
     {
@@ -551,7 +579,7 @@ annotate entity /DMO/FSA_C_RootTP with
   @UI.fieldGroup: [{ qualifier: 'chartData'  }]
   Dimensions;
 
-  @UI: { 
+  @UI: {
     // Search Term #DataPointRating, #DataPointRatingTable
     dataPoint: {
       qualifier: 'StarsValue',
@@ -569,8 +597,8 @@ annotate entity /DMO/FSA_C_RootTP with
       }
     ],
     // Search Term #HidingContent
-    fieldGroup: [{ 
-      qualifier: 'ShowWhenInEdit', 
+    fieldGroup: [{
+      qualifier: 'ShowWhenInEdit',
       type: #AS_DATAPOINT,
       label: 'Edit Rating Indicator'
     }]
@@ -590,7 +618,7 @@ annotate entity /DMO/FSA_C_RootTP with
         value: '_Contact'
       },
       // Search Term #UISemanticObject
-      { 
+      {
         qualifier: 'HeaderData',
         position: 40,
         label: 'IntentBased Navi (#UISemanticObject)',
@@ -635,8 +663,8 @@ annotate entity /DMO/FSA_C_RootTP with
   //  @Consumption.filter.defaultValue: '3' // Search term #FilterDefault
   CriticalityCode;
 
-//  @UI.hidden: true
-//  Uom;
+  //  @UI.hidden: true
+  //  Uom;
 
   @UI: {
     lineItem: [
@@ -709,9 +737,9 @@ annotate entity /DMO/FSA_C_RootTP with
     ],
     fieldGroup: [
       // Search Term #HidingContent
-      { 
+      {
         qualifier: 'ShowWhenInEdit'
-      }, 
+      },
       // Search Term #HeaderFieldGroup, #WithActionInOP
       {
         qualifier: 'HeaderData',
@@ -724,6 +752,15 @@ annotate entity /DMO/FSA_C_RootTP with
     ]
   }
   FieldWithCriticality;
+
+  @UI.fieldGroup: [
+    // Search Term #SideEffects
+    {
+      qualifier: 'SideEffects',
+      label: '(Check - Disable update of child)'
+    }
+  ]
+  DisableChildOperation;
 
   @UI.hidden: true
   DeleteHidden;
@@ -761,21 +798,34 @@ annotate entity /DMO/FSA_C_RootTP with
   }
   Region;
 
-  @UI.fieldGroup: [{ qualifier: 'communication' }] // Search Term #Communication
-  @EndUserText.label: 'E-mail (#StaticFeatureCtrl): '
+  @UI.fieldGroup: [{ qualifier: 'communication', label: 'E-mail (#StaticFeatureCtrl)' }] // Search Term #Communication
+  //  Search Term #DatapointHidden
+  @UI.dataPoint: {
+    title: 'Email (#DatapointHidden)',
+    qualifier: 'Email',
+    hidden: #(UpdateHidden)
+  }
+  @EndUserText.label: 'Email (#DatapointHidden)'
   Email;
 
   @UI.fieldGroup: [{ qualifier: 'communication' }] // Search Term #Communication
+  //  Search Term #DatapointHidden
+  @UI.dataPoint: {
+    title: 'Telephone (#DatapointHidden)',
+    qualifier: 'Telephone',
+    hidden: #(UpdateHidden)
+  }
+  @EndUserText.label: 'Telephone (#DatapointHidden)'
   Telephone;
 
   @UI.fieldGroup: [
     // Search Term #TimeAndDate
-    { 
-      qualifier: 'TimeDate', 
+    {
+      qualifier: 'TimeDate',
       position: 20
     },
     // Search Term #SideEffects
-    { 
+    {
       qualifier: 'SideEffects',
       label: '(Change to the past -trigger validation)'
     }
@@ -783,18 +833,18 @@ annotate entity /DMO/FSA_C_RootTP with
   ValidTo;
 
   // Search Term #TimeAndDate
-  @UI.fieldGroup: [{ 
-    qualifier: 'TimeDate', 
+  @UI.fieldGroup: [{
+    qualifier: 'TimeDate',
     position: 10
   }]
   Time;
-  
+
   // Search Term #IANATimezone
   @UI.fieldGroup: [
-    { 
-      qualifier: 'TimezoneInput', 
-      position: 10, 
-      label: 'SAP Timezone' 
+    {
+      qualifier: 'TimezoneInput',
+      position: 10,
+      label: 'SAP Timezone'
     }
     ,
     {
@@ -806,30 +856,30 @@ annotate entity /DMO/FSA_C_RootTP with
     }
   ]
   SAPTimezone;
-  
-  @UI.fieldGroup: [{ 
-    qualifier: 'TimezoneOutput', 
-    position: 10, 
-    label: 'IANA Timezone (#IANATimezone)' 
+
+  @UI.fieldGroup: [{
+    qualifier: 'TimezoneOutput',
+    position: 10,
+    label: 'IANA Timezone (#IANATimezone)'
   }]
   IANATimezone;
 
-  @UI.fieldGroup: [{ 
-    qualifier: 'TimezoneInput', 
+  @UI.fieldGroup: [{
+    qualifier: 'TimezoneInput',
     position: 20
   }]
   @UI.lineItem: [{ position: 210 }]
   Timestamp;
-  
-  @UI.fieldGroup: [{ 
-    qualifier: 'TimezoneOutput', 
-    position: 20,
-    label: 'IANA Timestamp (#IANATimezone)' 
+
+  @UI.fieldGroup: [{
+    qualifier: 'TimezoneOutput',
+    position: 20
   }]
   @UI.lineItem: [{ position: 210 }]
+  @EndUserText.label: 'IANA Timestamp (#IANATimezone)'
   IANATimestamp;
   // End Search Term #IANATimezone
-  
+
   @UI: {
     fieldGroup: [
       // Search Term #PlainText
@@ -843,6 +893,7 @@ annotate entity /DMO/FSA_C_RootTP with
     // Search Term #MultiLineText
     multiLineText: true
   }
+  @UI.adaptationHidden: true
   Description;
 
   @UI: {
@@ -907,19 +958,19 @@ annotate entity /DMO/FSA_C_RootTP with
     textArrangement: #TEXT_ONLY
   }
   NavigationID;
-  
+
   // Search Term #SideEffects
   @UI.fieldGroup: [
-    { 
+    {
       qualifier: 'SideEffects',
       label: 'Children Created from Action Overload (Click Reset to set to 0)'
     }
   ]
   TimesChildCreated;
-  
+
   // Search Term #SideEffects
   @UI.fieldGroup: [
-    { 
+    {
       qualifier: 'SideEffects',
       label: 'Total (Change Pieces at Child Entities)'
     }
@@ -934,9 +985,9 @@ annotate entity /DMO/FSA_C_RootTP with
 
   @UI.fieldGroup: [{ qualifier: 'AdminData' }] // Search Term #MultiFieldsCol
   LocalLastChangedAt;
-  
+
   // Search Term #MultiFieldsCol
-  @UI: { 
+  @UI: {
     fieldGroup: [{ qualifier: 'AdminData' }],
     lineItem: [
       {
@@ -985,6 +1036,14 @@ annotate entity /DMO/FSA_C_RootTP with
         emphasized: true,
         label: 'Change Progress (#ActionInSection)'
       },
+      // Search Term #DefaultFunctionForAction
+      {
+        qualifier: 'OPForm',
+        dataAction: 'selectInstance',
+        type: #FOR_ACTION,
+        emphasized: true,
+        label: 'Select Instance (#DefaultFunctionForAction)'
+      },
       // Search Term #InlineActionInForm
       {
         qualifier: 'OPForm',
@@ -1016,95 +1075,95 @@ annotate entity /DMO/FSA_C_RootTP with
     }
   ]
   _Child;
-  
+
   @UI.hidden: true
   StreamMimeType;
-  
+
   @UI.fieldGroup: [{  position: 10, qualifier: 'DataTypes' }]
   TypeAccp;
-  
+
   @UI.fieldGroup: [{  position: 20, qualifier: 'DataTypes' }]
   TypeBool;
-  
+
   @UI.fieldGroup: [{  position: 30, qualifier: 'DataTypes' }]
   TypeChar;
-  
+
   @UI.fieldGroup: [{  position: 40, qualifier: 'DataTypes' }]
   TypeClnt;
-  
+
   @UI.fieldGroup: [{  position: 50, qualifier: 'DataTypes' }]
   TypeCurr;
-  
+
   @UI.fieldGroup: [{  position: 60, qualifier: 'DataTypes' }]
   TypeDecAmount;
-  
+
   @UI.fieldGroup: [{  position: 70, qualifier: 'DataTypes' }]
   TypeDatn;
-  
+
   @UI.fieldGroup: [{  position: 80, qualifier: 'DataTypes' }]
   TypeDats;
-  
+
   @UI.fieldGroup: [{  position: 90, qualifier: 'DataTypes' }]
   TypeDec;
-  
+
   @UI.fieldGroup: [{  position: 100, qualifier: 'DataTypes' }]
   TypeDf16Dec;
-  
+
   @UI.fieldGroup: [{  position: 110, qualifier: 'DataTypes' }]
   TypeDf34Dec;
-  
+
   @UI.fieldGroup: [{  position: 120, qualifier: 'DataTypes' }]
   TypeFltp;
-  
+
   @UI.fieldGroup: [{  position: 130, qualifier: 'DataTypes' }]
   TypeInt1;
-  
+
   @UI.fieldGroup: [{  position: 140, qualifier: 'DataTypes' }]
   TypeInt2;
-  
+
   @UI.fieldGroup: [{  position: 150, qualifier: 'DataTypes' }]
   TypeInt4;
-  
+
   @UI.fieldGroup: [{  position: 160, qualifier: 'DataTypes' }]
   TypeInt8;
-  
+
   @UI.fieldGroup: [{  position: 170, qualifier: 'DataTypes' }]
   TypeNumc;
-  
+
   @UI.fieldGroup: [{  position: 180, qualifier: 'DataTypes' }]
   TypeQuan;
-  
+
   @UI.fieldGroup: [{  position: 190, qualifier: 'DataTypes' }]
   TypeFltpQuan;
-  
+
   @UI.fieldGroup: [{  position: 200, qualifier: 'DataTypes' }]
   TypeRawstring;
-  
+
   @UI.fieldGroup: [{  position: 210, qualifier: 'DataTypes' }]
   TypeSstring;
-  
+
   @UI.fieldGroup: [{  position: 220, qualifier: 'DataTypes' }]
   TypeString;
-  
+
   @UI.fieldGroup: [{  position: 230, qualifier: 'DataTypes' }]
   TypeTimn;
-  
+
   @UI.fieldGroup: [{  position: 240, qualifier: 'DataTypes' }]
   TypeTims;
 
   @UI.fieldGroup: [{  position: 250, qualifier: 'DataTypes' }]
   TypeUtclong;
-  
+
   @UI.fieldGroup: [{  position: 260, qualifier: 'DataTypes' }]
   TypeTzntstmps;
-  
+
   @UI.fieldGroup: [{  position: 270, qualifier: 'DataTypes' }]
   TypeTzntstmpl;
-  
+
   @UI.fieldGroup: [{  position: 280, qualifier: 'DataTypes' }]
   TypeDecTime;
-  
+
   @UI.fieldGroup: [{  position: 290, qualifier: 'DataTypes' }]
   TypeLang;
-  
+
 }

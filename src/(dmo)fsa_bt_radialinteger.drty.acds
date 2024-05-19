@@ -1,0 +1,7 @@
+@EndUserText.label: 'Radial Integer Value(from Simple Type)'
+@EndUserText.quickinfo: 'Radial Integer Value'
+@EndUserText.heading: 'Radial Integer'
+
+// Search Term #SimpleType
+
+define type /DMO/FSA_BT_RadialInteger: /DMO/FSA_BT_Integer

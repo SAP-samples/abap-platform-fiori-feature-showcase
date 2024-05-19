@@ -1,0 +1,7 @@
+@EndUserText.label: 'Progress Integer Value(from Simple Type)'
+@EndUserText.quickinfo: 'Progress Integer Value'
+@EndUserText.heading: 'Progress Integer'
+
+// Search Term #SimpleType
+
+define type /DMO/FSA_BT_ProgressInteger: /DMO/FSA_BT_Integer

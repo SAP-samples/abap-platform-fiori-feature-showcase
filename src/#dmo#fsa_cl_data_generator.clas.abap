@@ -75,6 +75,7 @@ CLASS /dmo/fsa_cl_data_generator IMPLEMENTATION.
     DELETE FROM /dmo/fsa_contact. "#EC CI_NOWHERE
     DELETE FROM /dmo/fsa_critlty. "#EC CI_NOWHERE
     DELETE FROM /dmo/fsa_nav. "#EC CI_NOWHERE
+    DELETE FROM /dmo/fsa_fldr_a. "#EC CI_NOWHERE
 
     COMMIT WORK.
   ENDMETHOD.
@@ -85,6 +86,7 @@ CLASS /dmo/fsa_cl_data_generator IMPLEMENTATION.
     INSERT /dmo/fsa_root_a  FROM TABLE @( lcl_fsa_root=>generate( ) ).
     INSERT /dmo/fsa_chart_a FROM TABLE @( lcl_fsa_chart=>generate( ) ).
     INSERT /dmo/fsa_child_a FROM TABLE @( lcl_fsa_child=>generate( ) ).
+    INSERT /dmo/fsa_fldr_a  FROM TABLE @( lcl_fsa_folder=>generate( ) ).
     INSERT /dmo/fsa_nav     FROM TABLE @( lcl_fsa_navigation=>generate( ) ).
     INSERT /dmo/fsa_gch_a   FROM TABLE @( lcl_fsa_grandchild=>generate( ) ).
     INSERT /dmo/fsa_contact FROM TABLE @( lcl_fsa_contact=>generate( ) ).

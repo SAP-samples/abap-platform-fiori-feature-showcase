@@ -10,11 +10,12 @@ total etag LastChangedAt
 authorization master ( instance )
 etag master LocalLastChangedAt
 {
-  create;
+  // Search Term #DefaultFunctionForCreate
+  create { default function GetDefaultsForCreate; }
   update (features : instance);
   delete (features : instance);
 
-  draft determine action Prepare { validation validateTimezone; }
+  draft determine action Prepare { validation validateTimezone; validation Child ~ validatePercentage; }
   draft action Edit;
   draft action Activate optimized;
   draft action Discard;
@@ -35,29 +36,36 @@ etag master LocalLastChangedAt
   action ( features : instance ) changeCriticality parameter /DMO/FSA_D_ChangeCriticalityP result [1] $self;
   action ( features : instance ) resetTimesChildCreated;
 
+  // Search Term #DefaultFunctionForAction
+  action ( features : instance ) selectInstance parameter /DMO/FSA_D_SelectInstanceP { default function GetDefaultsForSelectInstance; }
+
   determination generateOtherData on save { create; }
   determination setIntegerValue on modify { field IntegerValue; }
   determination setTime on modify { field SAPTimezone, Timestamp; }
+  determination updateTimesChildCreated on save { create; }
 
   validation validateValidTo on save   { create; update; field ValidTo; }
   validation validateTimezone on save { create; update; field SAPTimezone; }
 
   determine action validateDate { validation validateValidTo; }
   determine action validateChild { validation Child ~ validatePercentage; }
+  determine action updateTimes { determination ( always ) updateTimesChildCreated; }
 
+  // Search Term #DefaultFunctionForCBA
+  association _Child { create { default function GetDefaultsForChild external 'GetDefaultsForCreateByAssociation'; } with draft; }
   association _Chart { create; with draft; }
-  association _Child { create; with draft; }
 
   side effects {
     field IntegerValue affects field ProgressIntegerValue, field RadialIntegerValue;
+    field SAPTimezone affects field IANATimestamp, field IANATimezone;
+    field Timestamp affects field IANATimestamp;
     field NavigationID affects entity _Navigation;
     action changeCriticality affects field CriticalityCode;
     action resetTimesChildCreated affects field TimesChildCreated, permissions ( action resetTimesChildCreated );
-    determine action validateDate executed on field ValidTo affects messages;
-    determine action validateChild executed on entity _Child affects messages;
-    field SAPTimezone affects field IANATimestamp, field IANATimezone;
-    field Timestamp affects field IANATimestamp;
     action overwriteTimezone affects $self;
+    determine action validateDate executed on field ValidTo affects messages;
+    $self affects permissions ( update _Child );
+    determine action updateTimes executed on entity _Child affects field TotalPieces;
   }
 
   mapping for /dmo/fsa_root_a corresponding {
@@ -67,6 +75,7 @@ etag master LocalLastChangedAt
     CriticalityCode = criticality_code;
     DeleteHidden = delete_hidden;
     DescriptionCustomGrowing = description_customgrowing;
+    DisableChildOperation = disable_child_operation;
     FieldWithCriticality = field_with_criticality;
     FieldWithPrice = field_with_price;
     FieldWithQuantity = field_with_quantity;
@@ -84,8 +93,8 @@ etag master LocalLastChangedAt
     StringProperty = string_property;
     TargetValue = target_value;
     TimesChildCreated = times_child_created;
-    TotalPieces = total_pieces;
     TotalGrandchildPieces = total_granddchild_pieces;
+    TotalPieces = total_pieces;
     UpdateHidden = update_hidden;
     SAPTimezone = time_zone;
     ValidFrom = valid_from;
@@ -161,19 +170,23 @@ draft table /dmo/fsa_child_d
 lock dependent by _Root
 authorization dependent by _Root
 {
-  update;
+  update (features : instance);
   delete (features : instance);
 
   field ( readonly ) ParentId;
+  field ( readonly ) StreamFileReadonly; // Search Term #StreamStaticFeatureCtrl
+  field ( features : instance ) StreamFile;
   field ( readonly, numbering : managed ) ID;
-  field ( readonly : update, mandatory : create ) StringProperty;
+  field ( readonly : update, mandatory : create ) StringProperty, StreamIsReadOnly;
 
   determination calculateTotalPieces on modify { field ChildPieces; }
+  determination copyToReadOnlyStream on modify { field StreamFile; }
   validation validatePercentage on save { create; update;  }
 
   side effects {
     field ChildPieces affects field _Root.TotalPieces;
     field BooleanProperty affects permissions ( delete );
+    field StreamFile affects field StreamFileReadonly;
   }
 
   association _Root { with draft; }
@@ -189,7 +202,9 @@ authorization dependent by _Root
     StreamFilename = stream_filename;
     StreamMimeType = stream_mimetype;
     ChildPieces = child_pieces;
+    StreamIsReadOnly = stream_is_readonly;
   }
+
 }
 
 define behavior for /DMO/FSA_R_GrandchildTP alias Grandchild
@@ -204,19 +219,12 @@ authorization dependent by _Root
   field ( readonly, numbering : managed ) ID;
   field ( readonly ) ParentId, RootId;
 
-  determination calculateGrandchildPieces on modify { field GrandchildPieces; }
-
   association _Root { with draft; }
   association _Child { with draft; }
-
-//  side effects {
-//    field GrandchildPieces affects field _Child._Root.TotalGrandchildPieces;
-//  }
 
   mapping for /dmo/fsa_gch_a corresponding{
     ParentID = parent_id;
     RootID = root_id;
     StringProperty = string_property;
-    GrandchildPieces = grandchild_pieces;
   }
 }

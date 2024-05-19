@@ -8,6 +8,7 @@ define service /DMO/UI_FeatureShowcaseApp {
   expose /DMO/FSA_I_Contact      as Contact;
   expose /DMO/FSA_I_Criticality  as Criticality;
   expose /DMO/FSA_I_Navigation   as Navigation;
+  expose /DMO/FSA_I_Folder       as Folder;
   expose I_Country               as Country;
   expose I_UnitOfMeasure         as UnitOfMeasure;
   expose I_Currency              as Currency;

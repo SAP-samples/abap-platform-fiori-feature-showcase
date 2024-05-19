@@ -26,9 +26,11 @@ CLASS lhc_Root IMPLEMENTATION.
           AUTO FILL CID WITH VALUE #( FOR root IN roots ( %tky = root-%tky
                                                           %target = VALUE #( ( %is_draft = root-%is_draft
                                                                                StringProperty = |{ root-StringProperty } Child { lines( children ) + 1 }|  ##NO_TEXT
+                                                                               StreamIsReadOnly = ''
                                                                                FieldWithPercent = '10.00'
                                                                                %control-stringproperty = if_abap_behv=>mk-on
-                                                                               %control-fieldwithpercent = if_abap_behv=>mk-on ) ) ) )
+                                                                               %control-fieldwithpercent = if_abap_behv=>mk-on
+                                                                               %control-streamisreadonly = if_abap_behv=>mk-on ) ) ) )
         EXECUTE increaseTimesChildCreated
           FROM CORRESPONDING #( roots )
         MAPPED DATA(upd_mapped)

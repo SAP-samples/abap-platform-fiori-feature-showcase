@@ -8,15 +8,25 @@ The focus of this project is to demonstrate the features of annotation-driven SA
 
 To run the feature showcase app, pull the source code from GitHub into your system (see instructions below), locate the Service Binding and publish it locally. You can start the app preview by selecting the Root node. You can also run it by building your own Fiori app using the SAP Business Application Studio and connecting to the backend via the service binding.
 
-<img src="/../main/Images/search.gif" alt="How to search" title="How to search" width="80%" height="80%">
+## If you have a user in GitHub
 
-When you see a feature that you would like to implement, copy or take note of the search term (e.g., **#SearchTermExample**) and perform a search in the [Guide](/../../wiki/Feature-Showcase-App-Guide). You will be presented with 
+...when you see a feature that you would like to implement, copy or take note of the search term (e.g., **#SearchTermExample**) and perform a search in the Repository. Clicking on a result brings you to the markdown code of the respective Guide, so just click on the Preview and search for the term again.
+
+<img src="/../main/Images/search.gif" alt="How to search" title="How to Search - The New Guide" width="80%" height="80%">
+
+### If you *don't* have a user in GitHub
+
+...you can still use the old way and search in the [Wiki](https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/wiki/Feature-Showcase-App-Guide) instead.
+
+<img src="/../main/Images/old_search.gif" alt="How to search" title="How to Search - The Old Way" width="80%" height="80%">
+
+From the Guide, you will get 
 
 * a short description of the feature, 
 * code snippets and where to find them in the source code, 
 * and in some cases, a link to the official RAP documentation for more information.
 
-Alternatively, you can search for an annotation in the [Guide](/../../wiki/Feature-Showcase-App-Guide), get the search term, and use it to locate the UI feature in the app. If the annotation cannot be found, it could simply mean that it is not showcased in the current release.
+Alternatively, you can search for an annotation in the Guide/Wiki, get the search term, and use it to locate the UI feature in the app. If the annotation cannot be found, it could simply mean that it is not showcased in the current release.
 
 A number of issues have been identified and documented in the Wiki [Identified Constraints](/../../wiki/Identified-Constraints).
 
@@ -71,4 +81,4 @@ NOTE: The namespace /DMO/ is reserved for the demo content. Apart from the downl
 This project is provided "as-is": there is no guarantee that raised issues will be answered or addressed in future releases.
 
 ## License
-Copyright (c) 2022- 2023 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](/../main/LICENSES/Apache-2.0.txt) file.
+Copyright (c) 2022- 2024 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](/../main/LICENSES/Apache-2.0.txt) file.

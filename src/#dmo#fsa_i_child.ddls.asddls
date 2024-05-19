@@ -16,6 +16,9 @@ define view entity /DMO/FSA_I_Child
 
       @EndUserText.label : 'Boolean Property'
       boolean_property   as BooleanProperty,
+      
+      @EndUserText.label : 'Stream is Readonly'
+      stream_is_readonly as StreamIsReadOnly,
 
       @ObjectModel.foreignKey.association: '_Criticality'
       criticality_code   as CriticalityCode,

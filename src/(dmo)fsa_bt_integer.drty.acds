@@ -1,0 +1,7 @@
+@EndUserText.label: 'Integer Value(from Simple Type)'
+@EndUserText.quickinfo: 'Integer Value'
+@EndUserText.heading: 'Integer'
+
+// Search Term #SimpleType
+
+define type /DMO/FSA_BT_Integer: abap.int4
