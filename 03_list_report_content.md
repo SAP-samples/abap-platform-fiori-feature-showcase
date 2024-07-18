@@ -381,7 +381,8 @@ Without a sort order defined with `direction`, the values are ascending.
         by: 'StringProperty',
         direction: #ASC
       }
-    ]
+    ],
+    visualizations: [{type: #AS_LINEITEM}]
   }
 ]
 ```
