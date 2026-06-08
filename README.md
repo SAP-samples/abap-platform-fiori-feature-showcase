@@ -4,7 +4,7 @@
 ![App List Report](/Images/app-list.jpg)
 ![App Object Page](/Images/app-objectpage.jpg)
 
-The focus of this project is to demonstrate the features of annotation-driven SAP Fiori Elements for oData V4, using the ABAP RESTful Application Programming Model (RAP). The oData V4 app has been developed to be transactional- and draft- enabled.
+The focus of this project is to demonstrate the features of annotation-driven SAP Fiori Elements for OData V4, using the ABAP RESTful Application Programming Model (RAP). The OData V4 app has been developed to be transactional- and draft- enabled.
 
 To run the feature showcase app, pull the source code from GitHub into your system (see instructions below for different system types), locate the Service Binding and publish it locally. You can start the app preview by selecting the Root node. You can also run it by building your own Fiori app using the SAP Business Application Studio and connecting to the backend via the service binding.
 
